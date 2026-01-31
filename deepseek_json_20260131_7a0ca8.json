@@ -1,0 +1,27 @@
+{
+    "tickets": [
+        {
+            "id": "S-7834592",
+            "email": "user1@example.com",
+            "phone": "+1 *** *** 8562",
+            "wechat": "wxid_3980p3aon2ju12",
+            "timestamp": "2024-01-31T10:30:00+00:00",
+            "ip": "192.168.1.1",
+            "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "status": "pending",
+            "files": ["receipt1.jpg", "receipt2.pdf"],
+            "responses": [
+                {
+                    "sender": "user",
+                    "message": "Hi, I can't find my purchase receipts. My WeChat is wxid_3980p3aon2ju12",
+                    "timestamp": "2024-01-31T10:30:00+00:00"
+                },
+                {
+                    "sender": "admin",
+                    "message": "Hi there,\n\nUpon checking the ticket you've referenced you were asked to make a new support ticket using the original email address used to create the account.\n\nAt this time, you still haven't performed the step in order for us to verify that you own the account. Please take some time to check our previous messages.\n\nIf you have any further questions, please let us know - we will be happy to assist you.\n\nSteam Support\nTravis",
+                    "timestamp": "2024-01-31T11:20:00+00:00"
+                }
+            ]
+        }
+    ]
+}
