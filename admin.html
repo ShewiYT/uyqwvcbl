@@ -5,17 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Steam Support Admin Panel</title>
     <style>
+        /* (Стили остаются такими же, как в предыдущей версии) */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background: #0e141b; color: #c6d4df; min-height: 100vh; }
         
-        body {
-            background: #0e141b;
-            color: #c6d4df;
-            min-height: 100vh;
-        }
+        .login-screen, .admin-panel { display: none; }
+        .login-screen.active, .admin-panel.active { display: block; }
         
-        /* Login Screen */
         .login-screen {
-            display: flex;
             justify-content: center;
             align-items: center;
             height: 100vh;
@@ -31,10 +28,7 @@
             text-align: center;
         }
         
-        .login-box h2 {
-            color: #66c0f4;
-            margin-bottom: 30px;
-        }
+        .login-box h2 { color: #66c0f4; margin-bottom: 30px; }
         
         .login-input {
             width: 100%;
@@ -60,12 +54,6 @@
             width: 100%;
         }
         
-        /* Admin Panel */
-        .admin-panel {
-            display: none;
-            padding: 20px;
-        }
-        
         .admin-header {
             background: linear-gradient(90deg, #171a21 0%, #1b2838 100%);
             padding: 15px 20px;
@@ -79,7 +67,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
-            margin: 20px 0;
+            margin: 20px;
         }
         
         .stat-card {
@@ -101,12 +89,11 @@
             color: #76ffab;
         }
         
-        /* Tickets Table */
         .tickets-container {
             background: rgba(23, 26, 33, 0.8);
             border: 1px solid #2a475e;
             border-radius: 6px;
-            margin-top: 20px;
+            margin: 20px;
             overflow: hidden;
         }
         
@@ -135,7 +122,6 @@
         .status-reviewed { color: #66c0f4; }
         .status-resolved { color: #76ffab; }
         
-        /* Ticket Detail Modal */
         .modal-overlay {
             position: fixed;
             top: 0; left: 0;
@@ -146,6 +132,8 @@
             align-items: center;
             z-index: 1000;
         }
+        
+        .modal-overlay.active { display: flex; }
         
         .modal-content {
             background: #1b2838;
@@ -178,7 +166,6 @@
             font-size: 24px;
         }
         
-        /* Response Area */
         .response-area {
             margin-top: 20px;
             border-top: 1px solid #2a475e;
@@ -207,7 +194,6 @@
             font-weight: bold;
         }
         
-        /* Files Section */
         .files-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
@@ -227,7 +213,6 @@
             background: rgba(42,71,94,0.5);
         }
         
-        /* Chat Messages */
         .chat-container {
             background: rgba(0,0,0,0.2);
             border-radius: 6px;
@@ -262,11 +247,10 @@
             margin-bottom: 5px;
         }
         
-        /* Tabs */
         .tabs {
             display: flex;
             border-bottom: 1px solid #2a475e;
-            margin-bottom: 20px;
+            margin: 0 20px 20px;
         }
         
         .tab {
@@ -279,18 +263,45 @@
             border-bottom-color: #66c0f4;
             color: #66c0f4;
         }
+        
+        .api-status {
+            background: rgba(42,71,94,0.3);
+            padding: 10px 15px;
+            border-radius: 4px;
+            margin: 0 20px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-online { color: #76ffab; }
+        .status-offline { color: #ff6b6b; }
+        
+        .sync-btn {
+            background: #2a475e;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <!-- Login Screen -->
-    <div id="loginScreen" class="login-screen">
+    <div id="loginScreen" class="login-screen active">
         <div class="login-box">
             <h2><i class="fas fa-shield-alt"></i> Steam Support Admin</h2>
             <input type="password" id="adminPassword" class="login-input" placeholder="Admin Password" autocomplete="off">
             <button onclick="login()" class="login-btn">Login to Admin Panel</button>
             <p style="margin-top: 20px; font-size: 12px; color: #8f98a0;">
-                Default password: steamadmin2024
+                API Server: <code>http://elita313.beget.tech/api.php</code>
             </p>
         </div>
     </div>
@@ -307,6 +318,17 @@
             </div>
         </div>
         
+        <div class="api-status" id="apiStatus">
+            <span><i class="fas fa-server"></i> API Status:</span>
+            <span id="apiStatusText" class="status-offline">Checking...</span>
+            <button onclick="syncWithAPI()" class="sync-btn">
+                <i class="fas fa-sync-alt"></i> Sync with Server
+            </button>
+            <span style="margin-left:auto; font-size:11px;">
+                Server: <code>http://elita313.beget.tech/api.php</code>
+            </span>
+        </div>
+        
         <div class="stats-grid">
             <div class="stat-card">
                 <h3>Total Tickets</h3>
@@ -321,8 +343,8 @@
                 <div class="stat-number" id="resolvedTickets">0</div>
             </div>
             <div class="stat-card">
-                <h3>Today's Submissions</h3>
-                <div class="stat-number" id="todayTickets">0</div>
+                <h3>Server Tickets</h3>
+                <div class="stat-number" id="serverTickets">0</div>
             </div>
         </div>
         
@@ -330,7 +352,7 @@
             <div class="tab active" onclick="showTab('all')">All Tickets</div>
             <div class="tab" onclick="showTab('pending')">Pending</div>
             <div class="tab" onclick="showTab('resolved')">Resolved</div>
-            <div class="tab" onclick="showTab('files')">Files</div>
+            <div class="tab" onclick="showTab('server')">From Server</div>
         </div>
         
         <div class="tickets-container">
@@ -344,6 +366,9 @@
             </div>
             <div id="ticketsList">
                 <!-- Tickets will be loaded here -->
+                <div style="padding: 30px; text-align: center; color: #8f98a0;">
+                    <i class="fas fa-spinner fa-spin"></i> Loading tickets...
+                </div>
             </div>
         </div>
     </div>
@@ -372,6 +397,9 @@
                             <option value="reviewed">Under Review</option>
                             <option value="resolved">Resolved</option>
                         </select>
+                        <button onclick="saveToServer()" style="background: #5c7e10; color:white; border:none; padding:10px 15px; border-radius:4px; cursor:pointer;">
+                            <i class="fas fa-save"></i> Save to Server
+                        </button>
                     </div>
                 </div>
             </div>
@@ -394,14 +422,18 @@
     </div>
 
     <script>
+        const API_SERVER = 'http://elita313.beget.tech/api.php';
         const ADMIN_PASSWORD = 'steamadmin2024';
         let currentTickets = [];
+        let serverTickets = [];
         let currentTab = 'all';
+        let currentTicketId = null;
         
-        // Check if already logged in
+        // Check login status
         if (localStorage.getItem('steam_admin_logged_in') === 'true') {
-            document.getElementById('loginScreen').style.display = 'none';
-            document.getElementById('adminPanel').style.display = 'block';
+            document.getElementById('loginScreen').classList.remove('active');
+            document.getElementById('adminPanel').classList.add('active');
+            checkAPIStatus();
             loadTickets();
         }
         
@@ -410,11 +442,12 @@
             
             if (password === ADMIN_PASSWORD) {
                 localStorage.setItem('steam_admin_logged_in', 'true');
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('adminPanel').style.display = 'block';
+                document.getElementById('loginScreen').classList.remove('active');
+                document.getElementById('adminPanel').classList.add('active');
+                checkAPIStatus();
                 loadTickets();
             } else {
-                alert('Incorrect password!');
+                alert('Incorrect password! Default: steamadmin2024');
             }
         }
         
@@ -423,13 +456,65 @@
             location.reload();
         }
         
+        async function checkAPIStatus() {
+            const statusText = document.getElementById('apiStatusText');
+            const statusElement = document.getElementById('apiStatus');
+            
+            try {
+                const response = await fetch(API_SERVER, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    statusText.textContent = 'Online';
+                    statusText.className = 'status-online';
+                    statusElement.style.background = 'rgba(92, 126, 16, 0.2)';
+                    
+                    // Load tickets from server
+                    await loadTicketsFromServer();
+                    return true;
+                } else {
+                    throw new Error('Server error');
+                }
+            } catch (error) {
+                statusText.textContent = 'Offline (Using local data)';
+                statusText.className = 'status-offline';
+                statusElement.style.background = 'rgba(195, 66, 66, 0.2)';
+                return false;
+            }
+        }
+        
+        async function loadTicketsFromServer() {
+            try {
+                const response = await fetch(API_SERVER);
+                const data = await response.json();
+                
+                if (data.tickets && Array.isArray(data.tickets)) {
+                    serverTickets = data.tickets;
+                    document.getElementById('serverTickets').textContent = serverTickets.length;
+                    
+                    // Merge with local tickets
+                    mergeTickets();
+                    
+                    return true;
+                }
+            } catch (error) {
+                console.log('Failed to load from server:', error);
+                serverTickets = [];
+            }
+            return false;
+        }
+        
         function loadTickets() {
             // Load from localStorage
-            let tickets = JSON.parse(localStorage.getItem('steam_tickets') || '[]');
+            let localTickets = JSON.parse(localStorage.getItem('steam_tickets') || '[]');
             
-            // If no tickets in localStorage, create sample data
-            if (tickets.length === 0) {
-                tickets = [
+            // If no tickets, create sample data
+            if (localTickets.length === 0) {
+                localTickets = [
                     {
                         id: 'S-7834592',
                         email: 'user1@example.com',
@@ -437,7 +522,7 @@
                         wechat: 'wxid_3980p3aon2ju12',
                         timestamp: '2024-01-31T10:30:00Z',
                         ip: '192.168.1.1',
-                        userAgent: navigator.userAgent,
+                        user_agent: navigator.userAgent,
                         status: 'pending',
                         files: ['receipt1.jpg', 'receipt2.pdf'],
                         responses: [
@@ -445,19 +530,39 @@
                                 sender: 'user',
                                 message: "Hi, I can't find my purchase receipts. My WeChat is wxid_3980p3aon2ju12",
                                 timestamp: '2024-01-31T10:30:00Z'
-                            },
-                            {
-                                sender: 'admin',
-                                message: "Hi there,\n\nUpon checking the ticket you've referenced you were asked to make a new support ticket using the original email address used to create the account.\n\nAt this time, you still haven't performed the step in order for us to verify that you own the account. Please take some time to check our previous messages.\n\nIf you have any further questions, please let us know - we will be happy to assist you.\n\nSteam Support\nTravis",
-                                timestamp: '2024-01-31T11:20:00Z'
                             }
                         ]
                     }
                 ];
-                localStorage.setItem('steam_tickets', JSON.stringify(tickets));
+                localStorage.setItem('steam_tickets', JSON.stringify(localTickets));
             }
             
-            currentTickets = tickets;
+            currentTickets = localTickets;
+            updateStats();
+            renderTickets();
+        }
+        
+        function mergeTickets() {
+            // Combine local and server tickets
+            const allTickets = [...currentTickets];
+            
+            serverTickets.forEach(serverTicket => {
+                const existingIndex = allTickets.findIndex(t => t.id === serverTicket.id);
+                if (existingIndex === -1) {
+                    // New ticket from server
+                    allTickets.push(serverTicket);
+                } else {
+                    // Merge data (server data takes priority)
+                    allTickets[existingIndex] = {
+                        ...allTickets[existingIndex],
+                        ...serverTicket,
+                        // Keep local responses if server doesn't have them
+                        responses: serverTicket.responses || allTickets[existingIndex].responses
+                    };
+                }
+            });
+            
+            currentTickets = allTickets;
             updateStats();
             renderTickets();
         }
@@ -468,9 +573,7 @@
             document.getElementById('totalTickets').textContent = currentTickets.length;
             document.getElementById('pendingTickets').textContent = currentTickets.filter(t => t.status === 'pending').length;
             document.getElementById('resolvedTickets').textContent = currentTickets.filter(t => t.status === 'resolved').length;
-            document.getElementById('todayTickets').textContent = currentTickets.filter(t => 
-                t.timestamp.split('T')[0] === today
-            ).length;
+            document.getElementById('serverTickets').textContent = serverTickets.length;
         }
         
         function showTab(tab) {
@@ -487,11 +590,23 @@
                 filteredTickets = currentTickets.filter(t => t.status === 'pending');
             } else if (currentTab === 'resolved') {
                 filteredTickets = currentTickets.filter(t => t.status === 'resolved');
-            } else if (currentTab === 'files') {
-                filteredTickets = currentTickets.filter(t => t.files && t.files.length > 0);
+            } else if (currentTab === 'server') {
+                filteredTickets = serverTickets;
             }
             
             const ticketsList = document.getElementById('ticketsList');
+            
+            if (filteredTickets.length === 0) {
+                ticketsList.innerHTML = `
+                    <div style="padding: 40px; text-align: center; color: #8f98a0;">
+                        <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px;"></i>
+                        <p>No tickets found</p>
+                        ${currentTab === 'server' ? '<p style="font-size: 12px; margin-top: 10px;">API Server: ' + API_SERVER + '</p>' : ''}
+                    </div>
+                `;
+                return;
+            }
+            
             ticketsList.innerHTML = '';
             
             filteredTickets.forEach(ticket => {
@@ -501,9 +616,12 @@
                 
                 const date = new Date(ticket.timestamp).toLocaleDateString();
                 const statusClass = `status-${ticket.status}`;
+                const sourceIcon = serverTickets.some(t => t.id === ticket.id) ? 
+                    '<i class="fas fa-server" title="From server" style="margin-left:5px; color:#66c0f4; font-size:10px;"></i>' : 
+                    '<i class="fas fa-desktop" title="Local" style="margin-left:5px; color:#8f98a0; font-size:10px;"></i>';
                 
                 row.innerHTML = `
-                    <div><strong>${ticket.id}</strong></div>
+                    <div><strong>${ticket.id}</strong>${sourceIcon}</div>
                     <div>${ticket.email}</div>
                     <div>${ticket.phone}</div>
                     <div>${date}</div>
@@ -515,18 +633,45 @@
             });
         }
         
-        let currentTicketId = null;
-        
         function openTicket(ticketId) {
             currentTicketId = ticketId;
             const ticket = currentTickets.find(t => t.id === ticketId);
             
-            if (!ticket) return;
+            if (!ticket) {
+                // Try to fetch from server
+                fetchTicketFromServer(ticketId);
+                return;
+            }
             
+            displayTicketDetails(ticket);
+        }
+        
+        async function fetchTicketFromServer(ticketId) {
+            try {
+                const response = await fetch(`${API_SERVER}?ticket_id=${ticketId}`);
+                const data = await response.json();
+                
+                if (data.success && data.ticket) {
+                    displayTicketDetails(data.ticket);
+                    
+                    // Add to local tickets if not exists
+                    const existingIndex = currentTickets.findIndex(t => t.id === ticketId);
+                    if (existingIndex === -1) {
+                        currentTickets.push(data.ticket);
+                        localStorage.setItem('steam_tickets', JSON.stringify(currentTickets));
+                    }
+                } else {
+                    alert('Ticket not found on server');
+                }
+            } catch (error) {
+                alert('Failed to fetch ticket from server');
+            }
+        }
+        
+        function displayTicketDetails(ticket) {
             document.getElementById('modalTitle').textContent = `Ticket: ${ticket.id}`;
             document.getElementById('statusSelect').value = ticket.status;
             
-            // Build ticket details
             let html = `
                 <div style="margin-bottom: 20px;">
                     <h4><i class="fas fa-user-circle"></i> User Information</h4>
@@ -534,9 +679,10 @@
                         <p><strong>Email:</strong> ${ticket.email}</p>
                         <p><strong>Phone:</strong> ${ticket.phone}</p>
                         <p><strong>WeChat:</strong> ${ticket.wechat}</p>
-                        <p><strong>IP Address:</strong> ${ticket.ip}</p>
+                        <p><strong>IP Address:</strong> ${ticket.ip || 'Unknown'}</p>
                         <p><strong>Submitted:</strong> ${new Date(ticket.timestamp).toLocaleString()}</p>
-                        <p><strong>Device:</strong> ${ticket.userAgent}</p>
+                        <p><strong>User Agent:</strong> <small>${ticket.user_agent || 'Unknown'}</small></p>
+                        <p><strong>Data Source:</strong> ${serverTickets.some(t => t.id === ticket.id) ? 'Server API' : 'Local Storage'}</p>
                     </div>
                 </div>
             `;
@@ -551,7 +697,7 @@
                 
                 ticket.files.forEach((fileName, index) => {
                     html += `
-                        <div class="file-item" onclick="previewFile('${ticket.id}', ${index})">
+                        <div class="file-item" onclick="previewFileFromServer('${ticket.id}', '${fileName}')">
                             <i class="fas fa-file" style="font-size: 24px; margin-bottom: 5px;"></i>
                             <div style="font-size: 12px;">${fileName}</div>
                         </div>
@@ -584,14 +730,22 @@
                 });
                 
                 html += `</div></div>`;
+            } else {
+                html += `
+                    <div style="background: rgba(42,71,94,0.2); padding:15px; border-radius:6px; margin:15px 0;">
+                        <p style="color:#8f98a0; text-align:center;">
+                            <i class="fas fa-comment-slash"></i> No responses yet. Be the first to respond.
+                        </p>
+                    </div>
+                `;
             }
             
             document.getElementById('ticketDetails').innerHTML = html;
-            document.getElementById('ticketModal').style.display = 'flex';
+            document.getElementById('ticketModal').classList.add('active');
         }
         
         function closeModal() {
-            document.getElementById('ticketModal').style.display = 'none';
+            document.getElementById('ticketModal').classList.remove('active');
             loadTickets(); // Refresh list
         }
         
@@ -606,90 +760,124 @@
                 return;
             }
             
-            // Update ticket
-            const tickets = JSON.parse(localStorage.getItem('steam_tickets') || '[]');
-            const ticketIndex = tickets.findIndex(t => t.id === currentTicketId);
+            // Update ticket locally
+            const ticketIndex = currentTickets.findIndex(t => t.id === currentTicketId);
             
             if (ticketIndex !== -1) {
-                tickets[ticketIndex].status = status;
-                tickets[ticketIndex].responses.push({
+                currentTickets[ticketIndex].status = status;
+                currentTickets[ticketIndex].responses = currentTickets[ticketIndex].responses || [];
+                currentTickets[ticketIndex].responses.push({
                     sender: 'admin',
                     message: message,
                     timestamp: new Date().toISOString()
                 });
                 
-                localStorage.setItem('steam_tickets', JSON.stringify(tickets));
+                // Save to localStorage
+                localStorage.setItem('steam_tickets', JSON.stringify(currentTickets));
                 
                 // Clear input
                 document.getElementById('responseText').value = '';
                 
                 // Update display
-                openTicket(currentTicketId);
+                displayTicketDetails(currentTickets[ticketIndex]);
                 
-                // Send notification to Discord
-                const ticket = tickets[ticketIndex];
-                fetch('https://discord.com/api/webhooks/1465641089146032221/rwlhhe7jcZArcETKrbODEsd7FbEc_02I4BoSG9pYsnlKusnGAA-X3MmfnZePitANlSAk', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        content: `**📨 ADMIN RESPONSE SENT**\nTicket: ${ticket.id}\nStatus: ${status}\nResponse: ${message.substring(0, 200)}...`
-                    })
-                }).catch(() => {});
+                // Send Discord notification
+                sendDiscordNotification(currentTickets[ticketIndex], message);
+                
+                alert('Response saved locally');
             }
         }
         
-        function previewFile(ticketId, fileIndex) {
-            const fileData = JSON.parse(localStorage.getItem(`files_${ticketId}`) || '[]');
+        async function saveToServer() {
+            if (!currentTicketId) return;
             
-            if (fileData[fileIndex]) {
-                const file = fileData[fileIndex];
-                document.getElementById('fileName').textContent = file.name;
+            const ticket = currentTickets.find(t => t.id === currentTicketId);
+            if (!ticket) return;
+            
+            try {
+                // Here you would need to implement server-side update endpoint
+                // For now, we'll just show a message
+                alert('Server update functionality would need to be implemented in the PHP API');
                 
-                let previewHtml = `
-                    <p><strong>File Name:</strong> ${file.name}</p>
-                    <p><strong>Type:</strong> ${file.type}</p>
-                    <p><strong>Size:</strong> ${formatBytes(file.size)}</p>
-                `;
+                // Example of what the request would look like:
+                /*
+                const response = await fetch(API_SERVER + '?action=update', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(ticket)
+                });
+                */
                 
-                if (file.type.startsWith('image/')) {
-                    previewHtml += `<img src="data:${file.type};base64,${file.data}" style="max-width:100%; margin-top:15px;" alt="${file.name}">`;
-                } else if (file.type === 'application/pdf') {
-                    previewHtml += `<iframe src="data:application/pdf;base64,${file.data}" style="width:100%; height:500px; border:none;"></iframe>`;
-                } else {
-                    previewHtml += `<p style="margin-top:15px; color:#8f98a0;"><i>Preview not available for this file type</i></p>`;
-                }
-                
-                document.getElementById('filePreview').innerHTML = previewHtml;
-                document.getElementById('fileModal').style.display = 'flex';
-            } else {
-                alert('File data not found. It may have been uploaded from another device.');
+            } catch (error) {
+                alert('Failed to save to server');
             }
+        }
+        
+        async function previewFileFromServer(ticketId, fileName) {
+            // For security reasons, file preview from server requires proper server-side implementation
+            alert('File preview from server requires additional server-side setup.\n\nFiles would be stored at: http://elita313.beget.tech/uploads/' + ticketId + '_' + fileName);
+            
+            // Example implementation would be:
+            // const fileUrl = `http://elita313.beget.tech/uploads/${ticketId}_${fileName}`;
+            // document.getElementById('filePreview').innerHTML = `<iframe src="${fileUrl}" style="width:100%; height:500px;"></iframe>`;
+            // document.getElementById('fileModal').classList.add('active');
         }
         
         function closeFileModal() {
-            document.getElementById('fileModal').style.display = 'none';
+            document.getElementById('fileModal').classList.remove('active');
         }
         
-        function formatBytes(bytes) {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        function sendDiscordNotification(ticket, response) {
+            const webhookUrl = 'https://discord.com/api/webhooks/1465641089146032221/rwlhhe7jcZArcETKrbODEsd7FbEc_02I4BoSG9pYsnlKusnGAA-X3MmfnZePitANlSAk';
+            
+            const message = `**📨 ADMIN RESPONSE TO TICKET ${ticket.id}**\n` +
+                           `**User:** ${ticket.email}\n` +
+                           `**Response:** ${response.substring(0, 200)}${response.length > 200 ? '...' : ''}\n` +
+                           `**Status:** ${ticket.status}\n` +
+                           `**Time:** ${new Date().toLocaleString()}`;
+            
+            fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ content: message })
+            }).catch(() => {});
         }
         
-        // Auto-refresh every 30 seconds
+        async function syncWithAPI() {
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Syncing...';
+            btn.disabled = true;
+            
+            const wasSuccessful = await checkAPIStatus();
+            
+            if (wasSuccessful) {
+                alert('Successfully synced with server!');
+            } else {
+                alert('Failed to sync with server. Using local data.');
+            }
+            
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+        
+        // Auto-refresh every 60 seconds
         setInterval(() => {
             if (localStorage.getItem('steam_admin_logged_in') === 'true') {
-                loadTickets();
+                checkAPIStatus();
             }
-        }, 30000);
+        }, 60000);
         
         // Check URL for ticket parameter
         const urlParams = new URLSearchParams(window.location.search);
         const ticketParam = urlParams.get('ticket');
         if (ticketParam && localStorage.getItem('steam_admin_logged_in') === 'true') {
-            setTimeout(() => openTicket(ticketParam), 1000);
+            setTimeout(() => openTicket(ticketParam), 1500);
         }
     </script>
 </body>
