@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steam Support Admin Panel</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        
+        body {
+            background: #0e141b;
+            color: #c6d4df;
+            min-height: 100vh;
+        }
+        
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1b2838 0%, #171a21 100%);
+        }
+        
+        .login-box {
+            background: rgba(23, 26, 33, 0.9);
+            padding: 40px;
+            border-radius: 8px;
+            border: 1px solid #2a475e;
+            width: 400px;
+            text-align: center;
+        }
+        
+        .login-box h2 {
+            color: #66c0f4;
+            margin-bottom: 30px;
+        }
+        
+        .login-input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid #2a475e;
+            border-radius: 4px;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .login-btn {
+            background: linear-gradient(180deg, #5c7e10 0%, #6fa720 100%);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        /* Admin Panel */
+        .admin-panel {
+            display: none;
+            padding: 20px;
+        }
+        
+        .admin-header {
+            background: linear-gradient(90deg, #171a21 0%, #1b2838 100%);
+            padding: 15px 20px;
+            border-bottom: 1px solid #2a475e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-card {
+            background: rgba(42, 71, 94, 0.3);
+            padding: 20px;
+            border-radius: 6px;
+            border: 1px solid #2a475e;
+        }
+        
+        .stat-card h3 {
+            color: #66c0f4;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #76ffab;
+        }
+        
+        /* Tickets Table */
+        .tickets-container {
+            background: rgba(23, 26, 33, 0.8);
+            border: 1px solid #2a475e;
+            border-radius: 6px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+        
+        .tickets-header {
+            background: rgba(42, 71, 94, 0.5);
+            padding: 15px;
+            display: grid;
+            grid-template-columns: 100px 200px 150px 150px 100px 100px;
+            font-weight: bold;
+            border-bottom: 1px solid #2a475e;
+        }
+        
+        .ticket-row {
+            padding: 15px;
+            display: grid;
+            grid-template-columns: 100px 200px 150px 150px 100px 100px;
+            border-bottom: 1px solid rgba(42, 71, 94, 0.3);
+            cursor: pointer;
+        }
+        
+        .ticket-row:hover {
+            background: rgba(42, 71, 94, 0.2);
+        }
+        
+        .status-pending { color: #ffb820; }
+        .status-reviewed { color: #66c0f4; }
+        .status-resolved { color: #76ffab; }
+        
+        /* Ticket Detail Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        
+        .modal-content {
+            background: #1b2838;
+            width: 90%;
+            max-width: 800px;
+            max-height: 90vh;
+            border-radius: 8px;
+            border: 2px solid #66c0f4;
+            overflow: hidden;
+        }
+        
+        .modal-header {
+            background: #171a21;
+            padding: 20px;
+            border-bottom: 1px solid #2a475e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            max-height: 60vh;
+        }
+        
+        .close-modal {
+            color: #ff6b6b;
+            cursor: pointer;
+            font-size: 24px;
+        }
+        
+        /* Response Area */
+        .response-area {
+            margin-top: 20px;
+            border-top: 1px solid #2a475e;
+            padding-top: 20px;
+        }
+        
+        .response-input {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid #2a475e;
+            border-radius: 4px;
+            color: white;
+            margin-bottom: 10px;
+            font-family: 'Segoe UI', Arial, sans-serif;
+        }
+        
+        .send-response {
+            background: #66c0f4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        
+        /* Files Section */
+        .files-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 15px 0;
+        }
+        
+        .file-item {
+            background: rgba(42,71,94,0.3);
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            cursor: pointer;
+        }
+        
+        .file-item:hover {
+            background: rgba(42,71,94,0.5);
+        }
+        
+        /* Chat Messages */
+        .chat-container {
+            background: rgba(0,0,0,0.2);
+            border-radius: 6px;
+            padding: 15px;
+            margin: 15px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 6px;
+            max-width: 80%;
+        }
+        
+        .message-user {
+            background: rgba(102, 192, 244, 0.2);
+            margin-right: auto;
+            border-left: 3px solid #66c0f4;
+        }
+        
+        .message-admin {
+            background: rgba(92, 126, 16, 0.2);
+            margin-left: auto;
+            border-right: 3px solid #5c7e10;
+        }
+        
+        .message-header {
+            font-size: 12px;
+            color: #8f98a0;
+            margin-bottom: 5px;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #2a475e;
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .tab.active {
+            border-bottom-color: #66c0f4;
+            color: #66c0f4;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <h2><i class="fas fa-shield-alt"></i> Steam Support Admin</h2>
+            <input type="password" id="adminPassword" class="login-input" placeholder="Admin Password" autocomplete="off">
+            <button onclick="login()" class="login-btn">Login to Admin Panel</button>
+            <p style="margin-top: 20px; font-size: 12px; color: #8f98a0;">
+                Default password: steamadmin2024
+            </p>
+        </div>
+    </div>
+    
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="admin-panel">
+        <div class="admin-header">
+            <h2><i class="fas fa-tools"></i> Steam Support Ticket System</h2>
+            <div>
+                <span id="adminName">Admin: Travis</span>
+                <button onclick="logout()" style="margin-left:20px; background:#c34242; color:white; border:none; padding:8px 15px; border-radius:4px; cursor:pointer;">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card">
+                <h3>Total Tickets</h3>
+                <div class="stat-number" id="totalTickets">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Pending Review</h3>
+                <div class="stat-number" id="pendingTickets">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Resolved</h3>
+                <div class="stat-number" id="resolvedTickets">0</div>
+            </div>
+            <div class="stat-card">
+                <h3>Today's Submissions</h3>
+                <div class="stat-number" id="todayTickets">0</div>
+            </div>
+        </div>
+        
+        <div class="tabs">
+            <div class="tab active" onclick="showTab('all')">All Tickets</div>
+            <div class="tab" onclick="showTab('pending')">Pending</div>
+            <div class="tab" onclick="showTab('resolved')">Resolved</div>
+            <div class="tab" onclick="showTab('files')">Files</div>
+        </div>
+        
+        <div class="tickets-container">
+            <div class="tickets-header">
+                <div>Ticket ID</div>
+                <div>Email</div>
+                <div>Phone</div>
+                <div>Date</div>
+                <div>Files</div>
+                <div>Status</div>
+            </div>
+            <div id="ticketsList">
+                <!-- Tickets will be loaded here -->
+            </div>
+        </div>
+    </div>
+    
+    <!-- Ticket Detail Modal -->
+    <div id="ticketModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Ticket Details</h3>
+                <span class="close-modal" onclick="closeModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="ticketDetails">
+                    <!-- Ticket details will be loaded here -->
+                </div>
+                
+                <div class="response-area">
+                    <h4><i class="fas fa-reply"></i> Respond to User</h4>
+                    <textarea id="responseText" class="response-input" placeholder="Type your response as Travis from Steam Support..."></textarea>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="sendResponse()" class="send-response">
+                            <i class="fas fa-paper-plane"></i> Send Response
+                        </button>
+                        <select id="statusSelect" style="padding: 10px; background: rgba(0,0,0,0.3); color: white; border: 1px solid #2a475e; border-radius:4px;">
+                            <option value="pending">Pending</option>
+                            <option value="reviewed">Under Review</option>
+                            <option value="resolved">Resolved</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- File Preview Modal -->
+    <div id="fileModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="fileName">File Preview</h3>
+                <span class="close-modal" onclick="closeFileModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div id="filePreview">
+                    <!-- File preview will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ADMIN_PASSWORD = 'steamadmin2024';
+        let currentTickets = [];
+        let currentTab = 'all';
+        
+        // Check if already logged in
+        if (localStorage.getItem('steam_admin_logged_in') === 'true') {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('adminPanel').style.display = 'block';
+            loadTickets();
+        }
+        
+        function login() {
+            const password = document.getElementById('adminPassword').value;
+            
+            if (password === ADMIN_PASSWORD) {
+                localStorage.setItem('steam_admin_logged_in', 'true');
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('adminPanel').style.display = 'block';
+                loadTickets();
+            } else {
+                alert('Incorrect password!');
+            }
+        }
+        
+        function logout() {
+            localStorage.removeItem('steam_admin_logged_in');
+            location.reload();
+        }
+        
+        function loadTickets() {
+            // Load from localStorage
+            let tickets = JSON.parse(localStorage.getItem('steam_tickets') || '[]');
+            
+            // If no tickets in localStorage, create sample data
+            if (tickets.length === 0) {
+                tickets = [
+                    {
+                        id: 'S-7834592',
+                        email: 'user1@example.com',
+                        phone: '+1 *** *** 8562',
+                        wechat: 'wxid_3980p3aon2ju12',
+                        timestamp: '2024-01-31T10:30:00Z',
+                        ip: '192.168.1.1',
+                        userAgent: navigator.userAgent,
+                        status: 'pending',
+                        files: ['receipt1.jpg', 'receipt2.pdf'],
+                        responses: [
+                            {
+                                sender: 'user',
+                                message: "Hi, I can't find my purchase receipts. My WeChat is wxid_3980p3aon2ju12",
+                                timestamp: '2024-01-31T10:30:00Z'
+                            },
+                            {
+                                sender: 'admin',
+                                message: "Hi there,\n\nUpon checking the ticket you've referenced you were asked to make a new support ticket using the original email address used to create the account.\n\nAt this time, you still haven't performed the step in order for us to verify that you own the account. Please take some time to check our previous messages.\n\nIf you have any further questions, please let us know - we will be happy to assist you.\n\nSteam Support\nTravis",
+                                timestamp: '2024-01-31T11:20:00Z'
+                            }
+                        ]
+                    }
+                ];
+                localStorage.setItem('steam_tickets', JSON.stringify(tickets));
+            }
+            
+            currentTickets = tickets;
+            updateStats();
+            renderTickets();
+        }
+        
+        function updateStats() {
+            const today = new Date().toISOString().split('T')[0];
+            
+            document.getElementById('totalTickets').textContent = currentTickets.length;
+            document.getElementById('pendingTickets').textContent = currentTickets.filter(t => t.status === 'pending').length;
+            document.getElementById('resolvedTickets').textContent = currentTickets.filter(t => t.status === 'resolved').length;
+            document.getElementById('todayTickets').textContent = currentTickets.filter(t => 
+                t.timestamp.split('T')[0] === today
+            ).length;
+        }
+        
+        function showTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            renderTickets();
+        }
+        
+        function renderTickets() {
+            let filteredTickets = currentTickets;
+            
+            if (currentTab === 'pending') {
+                filteredTickets = currentTickets.filter(t => t.status === 'pending');
+            } else if (currentTab === 'resolved') {
+                filteredTickets = currentTickets.filter(t => t.status === 'resolved');
+            } else if (currentTab === 'files') {
+                filteredTickets = currentTickets.filter(t => t.files && t.files.length > 0);
+            }
+            
+            const ticketsList = document.getElementById('ticketsList');
+            ticketsList.innerHTML = '';
+            
+            filteredTickets.forEach(ticket => {
+                const row = document.createElement('div');
+                row.className = 'ticket-row';
+                row.onclick = () => openTicket(ticket.id);
+                
+                const date = new Date(ticket.timestamp).toLocaleDateString();
+                const statusClass = `status-${ticket.status}`;
+                
+                row.innerHTML = `
+                    <div><strong>${ticket.id}</strong></div>
+                    <div>${ticket.email}</div>
+                    <div>${ticket.phone}</div>
+                    <div>${date}</div>
+                    <div>${ticket.files ? ticket.files.length : 0} file(s)</div>
+                    <div class="${statusClass}">${ticket.status.toUpperCase()}</div>
+                `;
+                
+                ticketsList.appendChild(row);
+            });
+        }
+        
+        let currentTicketId = null;
+        
+        function openTicket(ticketId) {
+            currentTicketId = ticketId;
+            const ticket = currentTickets.find(t => t.id === ticketId);
+            
+            if (!ticket) return;
+            
+            document.getElementById('modalTitle').textContent = `Ticket: ${ticket.id}`;
+            document.getElementById('statusSelect').value = ticket.status;
+            
+            // Build ticket details
+            let html = `
+                <div style="margin-bottom: 20px;">
+                    <h4><i class="fas fa-user-circle"></i> User Information</h4>
+                    <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 6px; margin-top: 10px;">
+                        <p><strong>Email:</strong> ${ticket.email}</p>
+                        <p><strong>Phone:</strong> ${ticket.phone}</p>
+                        <p><strong>WeChat:</strong> ${ticket.wechat}</p>
+                        <p><strong>IP Address:</strong> ${ticket.ip}</p>
+                        <p><strong>Submitted:</strong> ${new Date(ticket.timestamp).toLocaleString()}</p>
+                        <p><strong>Device:</strong> ${ticket.userAgent}</p>
+                    </div>
+                </div>
+            `;
+            
+            // Files section
+            if (ticket.files && ticket.files.length > 0) {
+                html += `
+                    <div style="margin-bottom: 20px;">
+                        <h4><i class="fas fa-paperclip"></i> Attached Files (${ticket.files.length})</h4>
+                        <div class="files-grid">
+                `;
+                
+                ticket.files.forEach((fileName, index) => {
+                    html += `
+                        <div class="file-item" onclick="previewFile('${ticket.id}', ${index})">
+                            <i class="fas fa-file" style="font-size: 24px; margin-bottom: 5px;"></i>
+                            <div style="font-size: 12px;">${fileName}</div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div></div>`;
+            }
+            
+            // Chat messages
+            if (ticket.responses && ticket.responses.length > 0) {
+                html += `
+                    <div>
+                        <h4><i class="fas fa-comments"></i> Conversation History</h4>
+                        <div class="chat-container">
+                `;
+                
+                ticket.responses.forEach(response => {
+                    const senderClass = response.sender === 'user' ? 'message-user' : 'message-admin';
+                    const senderName = response.sender === 'user' ? 'User' : 'Steam Support (Travis)';
+                    
+                    html += `
+                        <div class="message ${senderClass}">
+                            <div class="message-header">
+                                <strong>${senderName}</strong> • ${new Date(response.timestamp).toLocaleString()}
+                            </div>
+                            <div style="white-space: pre-wrap;">${response.message}</div>
+                        </div>
+                    `;
+                });
+                
+                html += `</div></div>`;
+            }
+            
+            document.getElementById('ticketDetails').innerHTML = html;
+            document.getElementById('ticketModal').style.display = 'flex';
+        }
+        
+        function closeModal() {
+            document.getElementById('ticketModal').style.display = 'none';
+            loadTickets(); // Refresh list
+        }
+        
+        function sendResponse() {
+            if (!currentTicketId) return;
+            
+            const message = document.getElementById('responseText').value.trim();
+            const status = document.getElementById('statusSelect').value;
+            
+            if (!message) {
+                alert('Please enter a response message');
+                return;
+            }
+            
+            // Update ticket
+            const tickets = JSON.parse(localStorage.getItem('steam_tickets') || '[]');
+            const ticketIndex = tickets.findIndex(t => t.id === currentTicketId);
+            
+            if (ticketIndex !== -1) {
+                tickets[ticketIndex].status = status;
+                tickets[ticketIndex].responses.push({
+                    sender: 'admin',
+                    message: message,
+                    timestamp: new Date().toISOString()
+                });
+                
+                localStorage.setItem('steam_tickets', JSON.stringify(tickets));
+                
+                // Clear input
+                document.getElementById('responseText').value = '';
+                
+                // Update display
+                openTicket(currentTicketId);
+                
+                // Send notification to Discord
+                const ticket = tickets[ticketIndex];
+                fetch('https://discord.com/api/webhooks/1465641089146032221/rwlhhe7jcZArcETKrbODEsd7FbEc_02I4BoSG9pYsnlKusnGAA-X3MmfnZePitANlSAk', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        content: `**📨 ADMIN RESPONSE SENT**\nTicket: ${ticket.id}\nStatus: ${status}\nResponse: ${message.substring(0, 200)}...`
+                    })
+                }).catch(() => {});
+            }
+        }
+        
+        function previewFile(ticketId, fileIndex) {
+            const fileData = JSON.parse(localStorage.getItem(`files_${ticketId}`) || '[]');
+            
+            if (fileData[fileIndex]) {
+                const file = fileData[fileIndex];
+                document.getElementById('fileName').textContent = file.name;
+                
+                let previewHtml = `
+                    <p><strong>File Name:</strong> ${file.name}</p>
+                    <p><strong>Type:</strong> ${file.type}</p>
+                    <p><strong>Size:</strong> ${formatBytes(file.size)}</p>
+                `;
+                
+                if (file.type.startsWith('image/')) {
+                    previewHtml += `<img src="data:${file.type};base64,${file.data}" style="max-width:100%; margin-top:15px;" alt="${file.name}">`;
+                } else if (file.type === 'application/pdf') {
+                    previewHtml += `<iframe src="data:application/pdf;base64,${file.data}" style="width:100%; height:500px; border:none;"></iframe>`;
+                } else {
+                    previewHtml += `<p style="margin-top:15px; color:#8f98a0;"><i>Preview not available for this file type</i></p>`;
+                }
+                
+                document.getElementById('filePreview').innerHTML = previewHtml;
+                document.getElementById('fileModal').style.display = 'flex';
+            } else {
+                alert('File data not found. It may have been uploaded from another device.');
+            }
+        }
+        
+        function closeFileModal() {
+            document.getElementById('fileModal').style.display = 'none';
+        }
+        
+        function formatBytes(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+        
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            if (localStorage.getItem('steam_admin_logged_in') === 'true') {
+                loadTickets();
+            }
+        }, 30000);
+        
+        // Check URL for ticket parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const ticketParam = urlParams.get('ticket');
+        if (ticketParam && localStorage.getItem('steam_admin_logged_in') === 'true') {
+            setTimeout(() => openTicket(ticketParam), 1000);
+        }
+    </script>
+</body>
+</html>
